@@ -1,5 +1,8 @@
-TOPNAME = switch
-NXDC_FILES = constr/switch.nxdc
+#TOPNAME = switch
+#NXDC_FILES = constr/switch.nxdc
+
+TOPNAME = light
+NXDC_FILES = constr/light.nxdc
 INC_PATH ?=
 VERILATOR = verilator
 VERILATOR_CFLAGS += -MMD --build -cc \
@@ -19,8 +22,11 @@ SRC_AUTO_BIND = $(abspath $(BUILD_DIR)/auto_bind.cpp)
 $(SRC_AUTO_BIND): $(NXDC_FILES)
 	python3 $(NVBOARD_HOME)/scripts/auto_pin_bind.py $^ $@
 
-VSRCS = $(abspath ./vsrc/switch.v)
-CSRCS = $(abspath ./csrc/tb_switch.cpp)
+#VSRCS = $(abspath ./vsrc/switch.v)
+#CSRCS = $(abspath ./csrc/tb_switch.cpp)
+#CSRCS += $(SRC_AUTO_BIND)
+VSRCS = $(abspath ./vsrc/light.v)
+CSRCS = $(abspath ./csrc/tb_light.cpp)
 CSRCS += $(SRC_AUTO_BIND)
 
 # rules for NVBoard
