@@ -3,7 +3,7 @@
 
 #include "Vswitch.h"
 #include "Vswitch__Syms.h"
-#include "verilated_vcd_c.h"
+#include "verilated_fst_c.h"
 
 //============================================================
 // Constructors
@@ -106,9 +106,9 @@ std::unique_ptr<VerilatedTraceConfig> Vswitch::traceConfig() const {
 //============================================================
 // Trace configuration
 
-void Vswitch___024root__trace_init_top(Vswitch___024root* vlSelf, VerilatedVcd* tracep);
+void Vswitch___024root__trace_init_top(Vswitch___024root* vlSelf, VerilatedFst* tracep);
 
-VL_ATTR_COLD static void trace_init(void* voidSelf, VerilatedVcd* tracep, uint32_t code) {
+VL_ATTR_COLD static void trace_init(void* voidSelf, VerilatedFst* tracep, uint32_t code) {
     // Callback from tracep->open()
     Vswitch___024root* const __restrict vlSelf VL_ATTR_UNUSED = static_cast<Vswitch___024root*>(voidSelf);
     Vswitch__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
@@ -124,11 +124,11 @@ VL_ATTR_COLD static void trace_init(void* voidSelf, VerilatedVcd* tracep, uint32
     tracep->scopeEscape('.');
 }
 
-VL_ATTR_COLD void Vswitch___024root__trace_register(Vswitch___024root* vlSelf, VerilatedVcd* tracep);
+VL_ATTR_COLD void Vswitch___024root__trace_register(Vswitch___024root* vlSelf, VerilatedFst* tracep);
 
-VL_ATTR_COLD void Vswitch::trace(VerilatedVcdC* tfp, int levels, int options) {
+VL_ATTR_COLD void Vswitch::trace(VerilatedFstC* tfp, int levels, int options) {
     if (tfp->isOpen()) {
-        vl_fatal(__FILE__, __LINE__, __FILE__,"'Vswitch::trace()' shall not be called after 'VerilatedVcdC::open()'.");
+        vl_fatal(__FILE__, __LINE__, __FILE__,"'Vswitch::trace()' shall not be called after 'VerilatedFstC::open()'.");
     }
     if (false && levels && options) {}  // Prevent unused
     tfp->spTrace()->addModel(this);

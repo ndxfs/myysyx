@@ -1,12 +1,12 @@
 // Verilated -*- C++ -*-
 // DESCRIPTION: Verilator output: Tracing implementation internals
-#include "verilated_vcd_c.h"
+#include "verilated_fst_c.h"
 #include "Vswitch__Syms.h"
 
 
-void Vswitch___024root__trace_chg_sub_0(Vswitch___024root* vlSelf, VerilatedVcd::Buffer* bufp);
+void Vswitch___024root__trace_chg_sub_0(Vswitch___024root* vlSelf, VerilatedFst::Buffer* bufp);
 
-void Vswitch___024root__trace_chg_top_0(void* voidSelf, VerilatedVcd::Buffer* bufp) {
+void Vswitch___024root__trace_chg_top_0(void* voidSelf, VerilatedFst::Buffer* bufp) {
     VL_DEBUG_IF(VL_DBG_MSGF("+    Vswitch___024root__trace_chg_top_0\n"); );
     // Init
     Vswitch___024root* const __restrict vlSelf VL_ATTR_UNUSED = static_cast<Vswitch___024root*>(voidSelf);
@@ -16,7 +16,7 @@ void Vswitch___024root__trace_chg_top_0(void* voidSelf, VerilatedVcd::Buffer* bu
     Vswitch___024root__trace_chg_sub_0((&vlSymsp->TOP), bufp);
 }
 
-void Vswitch___024root__trace_chg_sub_0(Vswitch___024root* vlSelf, VerilatedVcd::Buffer* bufp) {
+void Vswitch___024root__trace_chg_sub_0(Vswitch___024root* vlSelf, VerilatedFst::Buffer* bufp) {
     if (false && vlSelf) {}  // Prevent unused
     Vswitch__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
     VL_DEBUG_IF(VL_DBG_MSGF("+    Vswitch___024root__trace_chg_sub_0\n"); );
@@ -28,7 +28,7 @@ void Vswitch___024root__trace_chg_sub_0(Vswitch___024root* vlSelf, VerilatedVcd:
     bufp->chgBit(oldp+2,(vlSelf->f));
 }
 
-void Vswitch___024root__trace_cleanup(void* voidSelf, VerilatedVcd* /*unused*/) {
+void Vswitch___024root__trace_cleanup(void* voidSelf, VerilatedFst* /*unused*/) {
     VL_DEBUG_IF(VL_DBG_MSGF("+    Vswitch___024root__trace_cleanup\n"); );
     // Init
     Vswitch___024root* const __restrict vlSelf VL_ATTR_UNUSED = static_cast<Vswitch___024root*>(voidSelf);
