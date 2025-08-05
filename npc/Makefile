@@ -7,7 +7,7 @@ switch:vsrc/switch.v csrc/tb_switch.cpp
 sim:switch
 	$(call git_commit, "sim RTL") # DO NOT REMOVE THIS LINE!!!	
 	obj_dir/Vswitch
-	gtkwave obj_dir/waveform.vcd
+	gtkwave waveform.vcd
 	@echo "Write this Makefile by your self."
 
 include ../Makefile
