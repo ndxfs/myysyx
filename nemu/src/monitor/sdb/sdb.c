@@ -60,6 +60,13 @@ static int cmd_si(char *args) {
 	return 0;
 }
 
+static int cmd_info(char *args) {
+  if(strcmp(args, "r") == 0) isa_reg_display();
+  else if(strcmp(args, "w") == 0) printf("Still wait to build this function--watch point\n");
+  else printf("Not find this command, please use \"help\" to find the usage of info");
+  return 0;
+}
+
 static struct {
   const char *name;
   const char *description;
@@ -69,6 +76,7 @@ static struct {
   { "c", "Continue the execution of the program", cmd_c },
   { "q", "Exit NEMU", cmd_q },
   { "si", "Continue the execution of the program with one step or more steps(N)", cmd_si},
+  { "info", "Print reg status with command 'r', print watchpoint with command 'w'", cmd_info},
   /* TODO: Add more commands */
 
 };
