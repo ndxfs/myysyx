@@ -74,6 +74,13 @@ static int cmd_x(char *args) {
 	char *endptr;
 	char *arg0 = strtok(NULL, " ");
 	char *arg1 = strtok(NULL, " ");
+
+	if(arg0 == NULL || arg1 == NULL)
+	{
+		printf("Need two parameters");
+		return 0;
+	}
+
 	long N = strtoul(arg0, &endptr, 10);
 	errno = 0;
 	if(errno == ERANGE || N < 0 || *endptr != '\0' || arg0 == endptr)
@@ -111,7 +118,7 @@ static int cmd_x(char *args) {
 			else
 			{
 				printf("Error: wrong address\n");
-				printf("address = " FMT_PADDR " is out of bound of pmem [" FMT_PADDR ", " FMT_PADDR "] at pc = " FMT_WORD, addr, PMEM_LEFT, PMEM_RIGHT, cpu.pc);
+				printf("address = " FMT_PADDR " is out of bound of pmem [" FMT_PADDR ", " FMT_PADDR "] at pc = " FMT_WORD "\n", addr, PMEM_LEFT, PMEM_RIGHT, cpu.pc);
 			}
 		}
 	}
