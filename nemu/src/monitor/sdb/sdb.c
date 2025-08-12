@@ -95,7 +95,7 @@ static int cmd_x(char *args) {
 			for(int i = 0; i < N; i++ )
 			{
 				addr_read = vaddr_read(addr + 4 * i, 4);
-				printf("0x%08x  %u\n", addr, addr_read);
+				printf("0x%08x  %08x\n", addr, addr_read);
 				//printf("%-6s:  0x%08x  %u\n", regs[i], gpr(i), gpr(i));
 			}
 		}
