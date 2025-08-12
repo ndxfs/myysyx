@@ -98,8 +98,8 @@ static int cmd_x(char *args) {
 				printf(": ");
 				for(int j = 0; j < 4 && j+i*4 < N; j++)
 				{
-					addr_read = vaddr_read(addr+4*i, 4);
-					printf("0x%08x\t", addr_read);
+					addr_read = vaddr_read(addr+4*i+j, 4);
+					printf("0x%08x        ", addr_read);
 				}
 				printf("\n");
 				//printf("%-6s:  0x%08x  %u\n", regs[i], gpr(i), gpr(i));
