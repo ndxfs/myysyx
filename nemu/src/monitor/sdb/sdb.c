@@ -99,8 +99,8 @@ static int cmd_x(char *args) {
 		{
 			//类型有待更改，比如地址以及读出来的直
 			word_t addr_read;
-			uint32_t addr = (uint32_t)addr_long;
-			if(in_pmem(addr) && in_pmem(addr+4*N))
+			vaddr_t addr = (vaddr_t)addr_long;
+			if(in_pmem(addr) && in_pmem(addr+4*N-1))
 			{
         for(int i = 0; i < N/4+1 && i*4 < N; i++ )
         {

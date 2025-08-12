@@ -21,7 +21,7 @@
 #include <regex.h>
 
 enum {
-  TK_NOTYPE = 256, TK_EQ,
+  TK_NOTYPE = 256, TK_ADD, TK_EQ, TK_SUB, TK_MUL, TK_DIV, TK_LB, TK_RB, TK_DEC_NUM, TK_HEX_NUM
 
   /* TODO: Add more token types */
 
@@ -36,9 +36,17 @@ static struct rule {
    * Pay attention to the precedence level of different rules.
    */
 
-  {" +", TK_NOTYPE},    // spaces
-  {"\\+", '+'},         // plus
-  {"==", TK_EQ},        // equal
+  {" +", TK_NOTYPE},                    // spaces
+  {"\\+", TK_ADD},                      // plus
+  {"==", TK_EQ},                        // equal
+  {"-", TK_SUB},                        // sub
+  {"\\*", TK_MUL},                       // times
+  {"/", TK_DIV},                        // div
+  {"(", TK_LB},                         // left_bracket
+  {")", TK_RB},                         // right_bracket
+  {"0[Xx][0-9a-fA-F]+", TK_HEX_NUM},    // hex number
+  {"[0-9]+", TK_DEC_NUM},               // dec number
+  
 };
 
 #define NR_REGEX ARRLEN(rules)
@@ -88,13 +96,68 @@ static bool make_token(char *e) {
             i, rules[i].regex, position, substr_len, substr_len, substr_start);
 
         position += substr_len;
-
+        
         /* TODO: Now a new token is recognized with rules[i]. Add codes
          * to record the token in the array `tokens'. For certain types
          * of tokens, some extra actions should be performed.
          */
-
+        if(nr_token >= 32)
+        {
+          printf("Error:input more than 32 tokens, please reduce tokens and try again\n");
+          return false;
+        }
         switch (rules[i].token_type) {
+          case TK_NOTYPE:break;
+          case TK_ADD:
+            tokens[nr_token].type = TK_ADD; 
+            nr_token++;
+            break;
+          case TK_EQ:
+            tokens[nr_token].type = TK_EQ; 
+            nr_token++;
+            break;
+          case TK_SUB:
+            tokens[nr_token].type = TK_SUB; 
+            nr_token++;
+            break;
+          case TK_MUL:
+            tokens[nr_token].type = TK_MUL; 
+            nr_token++;
+            break;
+          case TK_DIV:
+            tokens[nr_token].type = TK_DIV; 
+            nr_token++;
+            break;
+          case TK_LB:
+            tokens[nr_token].type = TK_LB; 
+            nr_token++;
+            break;
+          case TK_RB:
+            tokens[nr_token].type = TK_RB; 
+            nr_token++;
+            break;
+          case TK_DEC_NUM:
+            if(substr_len > 31)
+            {
+              printf("Error:this number is too long at position %d with len %d: %.*s\n", position - substr_len, substr_len, substr_len, substr_start);
+              return false;
+            }
+            strncpy(tokens[nr_token].str, substr_start, substr_len);
+            tokens[nr_token].str[substr_len] = '\0';
+            tokens[nr_token].type = TK_DEC_NUM; 
+            nr_token++;
+            break;
+          case TK_HEX_NUM:
+            if(substr_len > 31)
+            {
+              printf("Error:this number is too long at position %d with len %d: %.*s\n", position - substr_len, substr_len, substr_len, substr_start);
+              return false;
+            }
+            strncpy(tokens[nr_token].str, substr_start, substr_len);
+            tokens[nr_token].str[substr_len] = '\0';
+            tokens[nr_token].type = TK_HEX_NUM; 
+            nr_token++;
+            break;
           default: TODO();
         }
 
