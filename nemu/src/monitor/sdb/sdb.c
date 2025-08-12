@@ -94,7 +94,7 @@ static int cmd_x(char *args) {
 			uint32_t addr = (uint32_t)addr_long;
 			for(int i = 0; i < N/4+1 && i*4 < N; i++ )
 			{
-				printf("\033[32m0x%08x\033[0m", addr+4*i);
+				printf("\033[34m0x%08x\033[0m", addr+4*i);
 				printf(": ");
 				for(int j = 0; j < 4 && j+i*4 < N; j++)
 				{
