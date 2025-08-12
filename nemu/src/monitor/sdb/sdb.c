@@ -18,6 +18,8 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 #include "sdb.h"
+#include <errno.h>
+#include "memory/vaddr.h"
 
 static int is_batch_mode = false;
 
@@ -68,6 +70,40 @@ static int cmd_info(char *args) {
   return 0;
 }
 
+static int cmd_x(char *args) {
+	char *endptr;
+	char *arg0 = strtok(NULL, " ");
+	char *arg1 = strtok(NULL, " ");
+	long N = strtoul(arg0, &endptr, 10);
+	errno = 0;
+	if(errno == ERANGE || N < 0 || *endptr != '\0' || arg0 == endptr)
+	{
+		printf("Error: invalid parameter N");
+	}
+	else
+	{
+		errno = 0;
+		unsigned long addr_long = strtoul(arg1, &endptr, 16);
+		if(errno == ERANGE || addr_long > UINT32_MAX || *endptr != '\n' || arg1 == endptr)
+		{
+			printf("Error: invalid parameter EXPR");
+		}
+		else
+		{
+			word_t addr_read;
+			uint32_t addr = (uint32_t)addr_long;
+			for(int i = 0; i < N; i++ )
+			{
+				addr_read = vaddr_read(addr + 4 * i, 4);
+				printf("0x%08x  %u\n", addr, addr_read);
+				//printf("%-6s:  0x%08x  %u\n", regs[i], gpr(i), gpr(i));
+			}
+		}
+	}
+  //pmem = malloc(CONFIG_MSIZE);
+	return 0;
+}
+
 static struct {
   const char *name;
   const char *description;
@@ -78,6 +114,7 @@ static struct {
   { "q", "Exit NEMU", cmd_q },
   { "si", "Continue the execution of the program with one step or more steps(N)", cmd_si},
   { "info", "Print reg status with command 'r', print watchpoint with command 'w'", cmd_info},
+	{ "x", "Scan the memory with 4*N bytes from the address EXPR", cmd_x},
   /* TODO: Add more commands */
 
 };
