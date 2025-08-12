@@ -78,15 +78,15 @@ static int cmd_x(char *args) {
 	errno = 0;
 	if(errno == ERANGE || N < 0 || *endptr != '\0' || arg0 == endptr)
 	{
-		printf("Error: invalid parameter N");
+		printf("Error: invalid parameter N\n");
 	}
 	else
 	{
 		errno = 0;
 		unsigned long addr_long = strtoul(arg1, &endptr, 16);
-		if(errno == ERANGE || addr_long > UINT32_MAX || *endptr != '\n' || arg1 == endptr)
+		if(errno == ERANGE || addr_long > UINT32_MAX || *endptr != '\0' || arg1 == endptr)
 		{
-			printf("Error: invalid parameter EXPR");
+			printf("Error: invalid parameter EXPR\n");
 		}
 		else
 		{
