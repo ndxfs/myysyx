@@ -92,10 +92,15 @@ static int cmd_x(char *args) {
 		{
 			word_t addr_read;
 			uint32_t addr = (uint32_t)addr_long;
-			for(int i = 0; i < N; i++ )
+			for(int i = 0; i < N/4+1; i++ )
 			{
-				addr_read = vaddr_read(addr+4*i, 4);
-				printf("0x%08x:  0x%08x\n", addr+4*i, addr_read);
+				printf("0x%80x: ", addr+4*i);
+				for(int j = 0; j < 4 && j+i*4 < N; j++)
+				{
+					addr_read = vaddr_read(addr+4*i, 4);
+					printf("0x%08x\n  ", addr_read);
+				}
+				printf("\n");
 				//printf("%-6s:  0x%08x  %u\n", regs[i], gpr(i), gpr(i));
 			}
 		}
