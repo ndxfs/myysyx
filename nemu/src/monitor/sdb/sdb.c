@@ -20,7 +20,7 @@
 #include "sdb.h"
 #include <errno.h>
 #include "memory/vaddr.h"
-
+#include "memory/paddr.h"
 static int is_batch_mode = false;
 
 void init_regex();
@@ -90,19 +90,28 @@ static int cmd_x(char *args) {
 		}
 		else
 		{
+			//类型有待更改，比如地址以及读出来的直
 			word_t addr_read;
 			uint32_t addr = (uint32_t)addr_long;
-			for(int i = 0; i < N/4+1 && i*4 < N; i++ )
+			if(in_pmem(addr) && in_pmem(addr+4*N))
 			{
-				printf("\033[34m0x%08x\033[0m", addr+4*i);
-				printf(": ");
-				for(int j = 0; j < 4 && j+i*4 < N; j++)
-				{
-					addr_read = vaddr_read(addr+4*(4*i+j), 4);
-					printf("0x%08x        ", addr_read);
-				}
-				printf("\n");
-				//printf("%-6s:  0x%08x  %u\n", regs[i], gpr(i), gpr(i));
+        for(int i = 0; i < N/4+1 && i*4 < N; i++ )
+        {
+          printf("\033[34m0x%08x\033[0m", addr+4*i);
+          printf(": ");
+          for(int j = 0; j < 4 && j+i*4 < N; j++)
+          {
+            addr_read = vaddr_read(addr+4*(4*i+j), 4);
+            printf("0x%08x        ", addr_read);
+          }
+          printf("\n");
+          //printf("%-6s:  0x%08x  %u\n", regs[i], gpr(i), gpr(i));
+        }
+			}
+			else
+			{
+				printf("Error: wrong address\n");
+				printf("address = " FMT_PADDR " is out of bound of pmem [" FMT_PADDR ", " FMT_PADDR "] at pc = " FMT_WORD, addr, PMEM_LEFT, PMEM_RIGHT, cpu.pc);
 			}
 		}
 	}
