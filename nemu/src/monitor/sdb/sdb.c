@@ -94,11 +94,11 @@ static int cmd_x(char *args) {
 			uint32_t addr = (uint32_t)addr_long;
 			for(int i = 0; i < N/4+1; i++ )
 			{
-				printf("0x%80x: ", addr+4*i);
+				printf("0x%08x: ", addr+4*i);
 				for(int j = 0; j < 4 && j+i*4 < N; j++)
 				{
 					addr_read = vaddr_read(addr+4*i, 4);
-					printf("0x%08x\n  ", addr_read);
+					printf("0x%08x  ", addr_read);
 				}
 				printf("\n");
 				//printf("%-6s:  0x%08x  %u\n", regs[i], gpr(i), gpr(i));
