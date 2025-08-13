@@ -14,7 +14,7 @@
 ***************************************************************************************/
 
 #include <isa.h>
-
+#include <errno.h>
 /* We use the POSIX regex functions to process regular expressions.
  * Type 'man regex' for more information about POSIX regex functions.
  */
@@ -186,3 +186,162 @@ word_t expr(char *e, bool *success) {
 
   return 0;
 }
+
+
+
+bool check_parentheses(int p, int q) {
+	int count = 1;
+	if(tokens[p].type != TK_LB) return false;
+  p += 1;
+	while(p <= q)
+  {
+    if(tokens[p].type == TK_LB) count += 1;
+    else if(tokens[p].type == TK_RB) count -= 1;
+    if(count == 0) break;
+    p += 1;
+  }
+
+  if(count == 0 && p == q) return true;
+  return false;
+}
+
+word_t eval(int p, int q, bool *state) {
+  if (p > q) {
+    *state = false;
+    printf("Wrong expression at token %d\n", p);
+    return 0;
+    //Assert(0, "Wrong expression at token %d", p);
+    /* Bad expression */
+  }
+  else if (p == q) {
+    long x;
+    char *endptr;
+
+    *state = true;
+
+    if (tokens[p].str != NULL)
+    {
+      errno = 0;
+      if(tokens[p].type == TK_DEC_NUM)
+      {
+        x = strtoul(tokens[p].str, &endptr, 10);
+        if((errno == ERANGE || x < 0 || *endptr != '\0' || tokens[p].str == endptr) == 0)
+          return (word_t)x;
+        
+      }
+      else if(tokens[p].type == TK_HEX_NUM)
+      {
+        x = strtoul(tokens[p].str, &endptr, 16);
+        if((errno == ERANGE || x < 0 || *endptr != '\0' || tokens[p].str == endptr) == 0)
+          return (word_t)x;
+      }
+    }
+    *state = false;
+    printf("Wrong expression at token %d", p);
+    return 0;
+    //Assert(0, "Wrong expression at token %d", p);
+
+    /* Single token.
+    * For now this token should be a number.
+    * Return the value of the number.
+    */
+  }
+  else if (check_parentheses(p, q) == true) {
+    return eval(p + 1, q - 1, state);
+    /* The expression is surrounded by a matched pair of parentheses.
+    * If that is the case, just throw away the parentheses.
+    */
+  }
+  else {
+    int op = -1;
+    int bracket_count = 0;
+    int priority = 3;//优先级:== 0,+- 1,*/ 2,() 3
+    word_t val1, val2;
+    bool val1_state;
+    bool val2_state;
+    for (int i = q; i >=  p; i--)
+    {
+      if(tokens[i].type == TK_LB) bracket_count += 1;
+      else if(tokens[i].type == TK_RB) bracket_count -= 1;
+      else if(tokens[i].type != TK_DEC_NUM && tokens[i].type != TK_HEX_NUM && bracket_count == 0)
+      {
+        if(priority == 3)
+        {
+          if(tokens[i].type == TK_MUL || tokens[i].type == TK_DIV)
+          {
+            op = i;
+            priority = 2;
+          }
+          else if(tokens[i].type == TK_ADD || tokens[i].type == TK_SUB)
+          {
+            op = i;
+            priority = 1;
+          }
+          else if(tokens[i].type == TK_EQ)
+          {
+            op = i;
+            priority = 0;
+          }
+
+        }
+        else if(priority == 2)
+        {
+          if(tokens[i].type == TK_ADD || tokens[i].type == TK_SUB)
+          {
+            op = i;
+            priority = 1;
+          }
+          else if(tokens[i].type == TK_EQ)
+          {
+            op = i;
+            priority = 0;
+          }
+
+        }
+        else if(priority == 1)
+        {
+          if(tokens[i].type == TK_EQ)
+          {
+            op = i;
+            priority = 0;
+          }
+        }
+      }
+
+    }
+    if (op == -1)//未找到运算符
+    {  
+      *state = false;
+      printf("No operator found between token %d and %d\n", p, q);
+      return 0;
+    }
+    //op = the position of 主运算符 in the token expression;
+    val1 = eval(p, op - 1, &val1_state);
+    val2 = eval(op + 1, q, &val2_state);
+    *state = val1_state && val2_state;
+    switch (tokens[op].type) {
+      case TK_ADD: return val1 +  val2;
+      case TK_SUB: return val1 -  val2;/* ... */
+      case TK_MUL: return val1 *  val2;/* ... */
+      case TK_DIV: 
+        if(val2 == 0)
+        {
+          *state = false;
+          printf("Division by zero at token %d\n", op);
+          return 0;
+        }
+        return val1 /  val2;/* ... */
+      case TK_EQ : return val1 == val2;
+      default:
+        printf("Wrong expression at token %d\n", op);
+        *state = false;
+        return 0; 
+        //assert(0);
+    /* We should do more things here. */
+    }
+  }
+}
+
+
+
+
