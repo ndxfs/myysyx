@@ -174,7 +174,7 @@ static bool make_token(char *e) {
   return true;
 }
 
-
+word_t eval(int p, int q, bool *state);
 word_t expr(char *e, bool *success) {
   if (!make_token(e)) {
     *success = false;
@@ -182,9 +182,9 @@ word_t expr(char *e, bool *success) {
   }
 
   /* TODO: Insert codes to evaluate the expression. */
-  TODO();
+  //TODO();
+  return eval(0, nr_token, success);
 
-  return 0;
 }
 
 

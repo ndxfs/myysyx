@@ -137,8 +137,10 @@ static int cmd_p(char *args) {
   else
   {
     result = expr(args, &success);
-    printf("%d\n", result);
-    TODO();    
+    if(success) printf("%d\n", result);
+    else printf("Error:fail to evaluate expression\n");
+    
+    //TODO();    
   }
   return 0;
 }
