@@ -40,10 +40,10 @@ static struct rule {
   {"\\+", TK_ADD},                      // plus
   {"==", TK_EQ},                        // equal
   {"-", TK_SUB},                        // sub
-  {"\\*", TK_MUL},                       // times
+  {"\\*", TK_MUL},                      // times
   {"/", TK_DIV},                        // div
-  {"(", TK_LB},                         // left_bracket
-  {")", TK_RB},                         // right_bracket
+  {"\\(", TK_LB},                       // left_bracket
+  {"\\)", TK_RB},                       // right_bracket
   {"0[Xx][0-9a-fA-F]+", TK_HEX_NUM},    // hex number
   {"[0-9]+", TK_DEC_NUM},               // dec number
   
