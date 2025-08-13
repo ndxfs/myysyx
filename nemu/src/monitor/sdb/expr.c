@@ -20,6 +20,8 @@
  */
 #include <regex.h>
 
+
+
 enum {
   TK_NOTYPE = 256, TK_ADD, TK_EQ, TK_SUB, TK_MUL, TK_DIV, TK_LB, TK_RB, TK_DEC_NUM, TK_HEX_NUM
 
@@ -225,15 +227,24 @@ word_t eval(int p, int q, bool *state) {
       if(tokens[p].type == TK_DEC_NUM)
       {
         x = strtoul(tokens[p].str, &endptr, 10);
-        if((errno == ERANGE || x < 0 || *endptr != '\0' || tokens[p].str == endptr) == 0)
-          return (word_t)x;
-        
+        if((errno == ERANGE || *endptr != '\0' || tokens[p].str == endptr) == 0)
+        {
+          if(x < WORD_MAX)
+            return (word_t)x;
+          else
+            printf("input value:%s is out of max number %llu", tokens[p].str, (unsigned long long)WORD_MAX);
+        }
       }
       else if(tokens[p].type == TK_HEX_NUM)
       {
         x = strtoul(tokens[p].str, &endptr, 16);
-        if((errno == ERANGE || x < 0 || *endptr != '\0' || tokens[p].str == endptr) == 0)
-          return (word_t)x;
+        if((errno == ERANGE || *endptr != '\0' || tokens[p].str == endptr) == 0)
+        {
+          if(x < WORD_MAX)
+            return (word_t)x;
+          else
+            printf("input value:%s is out of max number %llu", tokens[p].str, (unsigned long long)WORD_MAX);
+        }
       }
     }
     *state = false;
@@ -255,7 +266,7 @@ word_t eval(int p, int q, bool *state) {
   else {
     int op = -1;
     int bracket_count = 0;
-    int priority = 3;//优先级:== 0,+- 1,*/ 2,() 3
+    int priority = 4;//优先级:== 0,+- 1,*/ 2,- 3,() 4
     word_t val1, val2;
     bool val1_state;
     bool val2_state;
@@ -265,6 +276,45 @@ word_t eval(int p, int q, bool *state) {
       else if(tokens[i].type == TK_RB) bracket_count -= 1;
       else if(tokens[i].type != TK_DEC_NUM && tokens[i].type != TK_HEX_NUM && bracket_count == 0)
       {
+        if(priority == 4)
+        {
+          if(tokens[i].type == TK_MUL || tokens[i].type == TK_DIV)
+          {
+            op = i;
+            priority = 2;
+          }
+          else if(tokens[i].type == TK_ADD)
+          {
+            op = i;
+            priority = 1;
+          }
+          else if(tokens[i].type == TK_SUB)
+          {
+            if(i != 0)
+            {
+              if(tokens[i-1].type == TK_DEC_NUM || tokens[i-1].type == TK_HEX_NUM)
+              {
+                op = i;
+                priority = 1;
+              }
+              else
+              {
+                op = i;
+                priority = 3;
+              }
+            }
+            else
+            {
+              op = i;
+              priority = 3;
+            }
+          }
+          else if(tokens[i].type == TK_EQ)
+          {
+            op = i;
+            priority = 0;
+          }
+        }
         if(priority == 3)
         {
           if(tokens[i].type == TK_MUL || tokens[i].type == TK_DIV)
@@ -272,10 +322,21 @@ word_t eval(int p, int q, bool *state) {
             op = i;
             priority = 2;
           }
-          else if(tokens[i].type == TK_ADD || tokens[i].type == TK_SUB)
+          else if(tokens[i].type == TK_ADD)
           {
             op = i;
             priority = 1;
+          }
+          else if(tokens[i].type == TK_SUB)
+          {
+            if(i != 0)
+            {
+              if(tokens[i-1].type == TK_DEC_NUM || tokens[i-1].type == TK_HEX_NUM)
+              {
+                op = i;
+                priority = 1;
+              }
+            }
           }
           else if(tokens[i].type == TK_EQ)
           {
@@ -320,7 +381,7 @@ word_t eval(int p, int q, bool *state) {
     {
       val2 = eval(op + 1, q, &val2_state);
       *state = val2_state;
-      return -val2;
+      return ~val2 + 1;
     }
     val1 = eval(p, op - 1, &val1_state);
     val2 = eval(op + 1, q, &val2_state);
