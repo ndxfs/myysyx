@@ -316,13 +316,19 @@ word_t eval(int p, int q, bool *state) {
       return 0;
     }
     //op = the position of 主运算符 in the token expression;
+    if(op == p && tokens[op].type == TK_SUB)
+    {
+      val2 = eval(op + 1, q, &val2_state);
+      *state = val2_state;
+      return -val2;
+    }
     val1 = eval(p, op - 1, &val1_state);
     val2 = eval(op + 1, q, &val2_state);
     *state = val1_state && val2_state;
     switch (tokens[op].type) {
       case TK_ADD: return val1 +  val2;
       case TK_SUB: return val1 -  val2;/* ... */
-      case TK_MUL: return val1 *  val2;/* ... */
+      case TK_MUL: return (word_t)((int)val1 *  (int)val2);/* ... */
       case TK_DIV: 
         if(val2 == 0)
         {
@@ -330,7 +336,7 @@ word_t eval(int p, int q, bool *state) {
           printf("Division by zero at token %d\n", op);
           return 0;
         }
-        return val1 /  val2;/* ... */
+        return (word_t)((int)val1 /  (int)val2);/* ... */
       case TK_EQ : return val1 == val2;
       default:
         printf("Wrong expression at token %d\n", op);
