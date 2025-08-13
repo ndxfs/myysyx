@@ -65,7 +65,7 @@ static int cmd_si(char *args) {
 
 static int cmd_info(char *args) {
   if(strcmp(args, "r") == 0) isa_reg_display();
-  else if(strcmp(args, "w") == 0) printf("Still wait to build this function--watch point\n");
+  else if(strcmp(args, "w") == 0) TODO();
   else printf("Not find this command, please use \"help\" to find the usage of info\n");
   return 0;
 }
@@ -126,6 +126,25 @@ static int cmd_x(char *args) {
 	return 0;
 }
 
+static int cmd_p(char *args) {
+	word_t result;
+	bool success;
+	result = expr(args, &success);
+	printf("%d", result);
+	TODO();
+	return 0;
+}
+
+static int cmd_w(char *args) {
+	TODO();
+	return 0;
+}
+
+static int cmd_d(char *args) {
+	TODO();
+	return 0;
+}
+
 static struct {
   const char *name;
   const char *description;
@@ -137,6 +156,9 @@ static struct {
   { "si", "Continue the execution of the program with one step or more steps(N)", cmd_si},
   { "info", "Print reg status with command 'r', print watchpoint with command 'w'", cmd_info},
 	{ "x", "Scan the memory with 4*N bytes from the address EXPR", cmd_x},
+	{ "p", "Evaluate EXPR", cmd_p},
+	{ "w", "Set watchpoint", cmd_w},
+	{ "d", "Delete watchpoint", cmd_d},
   /* TODO: Add more commands */
 
 };
