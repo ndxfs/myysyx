@@ -64,10 +64,13 @@ static int cmd_si(char *args) {
 }
 
 static int cmd_info(char *args) {
-  if(strcmp(args, "r") == 0) isa_reg_display();
-  else if(strcmp(args, "w") == 0) TODO();
-  else printf("Not find this command, please use \"help\" to find the usage of info\n");
-  return 0;
+	if(args != NULL)
+	{
+    if(strcmp(args, "r") == 0) isa_reg_display();
+    else if(strcmp(args, "w") == 0) TODO();
+    else printf("Not find this command, please use \"help\" to find the usage of info\n");
+  }
+    return 0;
 }
 
 static int cmd_x(char *args) {
