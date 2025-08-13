@@ -70,6 +70,7 @@ static int cmd_info(char *args) {
     else if(strcmp(args, "w") == 0) TODO();
     else printf("Not find this command, please use \"help\" to find the usage of info\n");
   }
+  else printf("Need one parameter\n");
     return 0;
 }
 
@@ -80,7 +81,7 @@ static int cmd_x(char *args) {
 
 	if(arg0 == NULL || arg1 == NULL)
 	{
-		printf("Need two parameters");
+		printf("Need two parameters\n");
 		return 0;
 	}
 
@@ -132,19 +133,33 @@ static int cmd_x(char *args) {
 static int cmd_p(char *args) {
 	word_t result;
 	bool success;
-	result = expr(args, &success);
-	printf("%d", result);
-	TODO();
-	return 0;
+  if(args == NULL) printf("Need one parameter\n");
+  else
+  {
+    result = expr(args, &success);
+    printf("%d\n", result);
+    TODO();    
+  }
+  return 0;
 }
 
 static int cmd_w(char *args) {
-	TODO();
+  if(args == NULL) printf("Need one parameter\n");
+  else
+  {
+    TODO();
+  }
+	
 	return 0;
 }
 
 static int cmd_d(char *args) {
-	TODO();
+  if(args == NULL) printf("Need one parameter\n");
+  else
+  {
+    TODO();
+  }
+
 	return 0;
 }
 
