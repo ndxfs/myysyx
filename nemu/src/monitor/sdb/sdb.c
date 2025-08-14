@@ -200,11 +200,11 @@ static int cmd_pt(char *args) {
     word_t result = expr(expr_buf, &success);
     if(success && (result == expected))
     {
-      printf("\033[32mline %d success, expect %u result %u\033[0m\n", i, expected, result);
+      printf("\033[32mline %3d success, expect %32u result %32u\033[0m\n", i, expected, result);
     } 
     else
     {
-      printf("\033[31mline %d fail, expect %u, result %u\033[0m\n", i, expected, result);
+      printf("\033[31mline %3d fail, expect %32u, result %32u\033[0m\n", i, expected, result);
     }
   }
   fclose(fp);
