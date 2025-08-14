@@ -77,7 +77,7 @@ typedef struct token {
   char str[32];
 } Token;
 
-static Token tokens[32] __attribute__((used)) = {};
+static Token tokens[500] __attribute__((used)) = {};
 static int nr_token __attribute__((used))  = 0;
 
 static bool make_token(char *e) {
@@ -103,9 +103,9 @@ static bool make_token(char *e) {
          * to record the token in the array `tokens'. For certain types
          * of tokens, some extra actions should be performed.
          */
-        if(nr_token >= 32)
+        if(nr_token >= 500)
         {
-          printf("Error:input more than 32 tokens, please reduce tokens and try again\n");
+          printf("Error:input more than 500 tokens, please reduce tokens and try again\n");
           return false;
         }
         switch (rules[i].token_type) {
