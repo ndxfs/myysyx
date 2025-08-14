@@ -174,7 +174,7 @@ static int cmd_pt(char *args) {
       printf("Unable to open the file\n");
       return 0;
   }
-	for(int i = 0; i < 100; i++)
+	for(int i = 0; i < 1000; i++)
   {
     if (!fgets(result_buf, sizeof(result_buf), fp)) 
     {
@@ -200,11 +200,11 @@ static int cmd_pt(char *args) {
     word_t result = expr(expr_buf, &success);
     if(success && (result == expected))
     {
-      printf("\033[32mline %3d success, expect %32u result %32u\033[0m\n", i, expected, result);
+      printf("\033[32mline %3d success, expect %10u result %10u\033[0m\n", i, expected, result);
     } 
     else
     {
-      printf("\033[31mline %3d fail, expect %32u, result %32u\033[0m\n", i, expected, result);
+      printf("\033[31mline %3d fail, expect %10u, result %10u\033[0m\n", i, expected, result);
     }
   }
   fclose(fp);
