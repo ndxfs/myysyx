@@ -167,7 +167,7 @@ static int cmd_d(char *args) {
 
 static int cmd_pt(char *args) {
   bool success;
-  FILE *fp = fopen("~/ysyx/ysyx-workbench/nemu/tools/gen-expr/input", "r");
+  FILE *fp = fopen("../tools/gen-expr/input", "r");
   char result_buf[64] = {};
   char expr_buf[65536] = {};
   if (!fp) {
