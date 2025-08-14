@@ -200,7 +200,7 @@ static int cmd_pt(char *args) {
     word_t result = expr(expr_buf, &success);
     if(success || result == expected)
     {
-      printf("\033[32mline %d success\033[0m\n", i);
+      printf("\033[32mline %d success, expect %u, result %u\033[0m\n", i, expected, result);
     } 
     else
     {
