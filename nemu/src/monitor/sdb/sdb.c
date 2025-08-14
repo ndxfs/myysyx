@@ -204,7 +204,7 @@ static int cmd_pt(char *args) {
     } 
     else
     {
-      printf("\033[32mline %d fail, expect %u, result %u\033[0m\n", i, expected, result);
+      printf("\033[31mline %d fail, expect %u, result %u\033[0m\n", i, expected, result);
     }
   }
   fclose(fp);
