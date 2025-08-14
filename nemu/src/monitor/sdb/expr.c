@@ -292,7 +292,7 @@ word_t eval(int p, int q, bool *state) {
           {
             if(i != 0)
             {
-              if(tokens[i-1].type == TK_DEC_NUM || tokens[i-1].type == TK_HEX_NUM)
+              if(tokens[i-1].type == TK_DEC_NUM || tokens[i-1].type == TK_HEX_NUM || tokens[i-1].type == TK_RB)
               {
                 op = i;
                 priority = 1;
