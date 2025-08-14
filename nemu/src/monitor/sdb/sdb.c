@@ -165,6 +165,52 @@ static int cmd_d(char *args) {
 	return 0;
 }
 
+static int cmd_pt(char *args) {
+  bool success;
+  FILE *fp = fopen("../../tools/gen-expr/input", "r");
+  char result_buf[64] = {};
+  char expr_buf[65536] = {};
+  if (!fp) {
+      printf("Unable to open the file\n");
+      return 0;
+  }
+	for(int i = 0; i < 100; i++)
+  {
+    if (!fgets(result_buf, sizeof(result_buf), fp)) 
+    {
+      if (feof(fp)) break;//文件结束
+      printf("fail to read\n");
+      break;
+    }
+
+    if (!fgets(expr_buf, sizeof(expr_buf), fp)) 
+    {
+      if (feof(fp)) break;//文件结束
+      printf("fail to read\n");
+      break;
+    }
+    result_buf[strcspn(result_buf, "\r\n")] = '\0';
+    expr_buf[strcspn(expr_buf, "\r\n")] = '\0';
+    word_t expected;
+    if (sscanf(result_buf, "%u", &expected) != 1) 
+    {
+      printf("line %d get error data - %s\n", i-1, result_buf);
+      continue;
+    }
+    word_t result = expr(args, &success);
+    if(success || result == expected)
+    {
+      printf("\033[32mline %d success\033[0m\n", i);
+    } 
+    else
+    {
+      printf("\033[32mline %d fail, expect %u, result %u\033[0m\n", i, expected, result);
+    }
+  }
+  fclose(fp);
+  return 0;
+}
+
 static struct {
   const char *name;
   const char *description;
@@ -179,6 +225,7 @@ static struct {
 	{ "p", "Evaluate EXPR", cmd_p},
 	{ "w", "Set watchpoint", cmd_w},
 	{ "d", "Delete watchpoint", cmd_d},
+	{ "pt", "Test the function evaluate EXPR", cmd_pt},
   /* TODO: Add more commands */
 
 };

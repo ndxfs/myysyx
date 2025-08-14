@@ -22,6 +22,7 @@
 
 // this should be enough
 static char buf[65536] = {};
+static char *buf_ptr = buf;
 static char code_buf[65536 + 128] = {}; // a little larger than `buf`
 static char *code_format =
 "#include <stdio.h>\n"
@@ -31,8 +32,56 @@ static char *code_format =
 "  return 0; "
 "}";
 
+int choose(int n) {
+  return rand() % n;
+}
+
+void gen(char c) {
+  *buf_ptr = c;
+  buf_ptr++;
+}
+
+static void gen_num() {
+  uint32_t num = rand() % (2^31);
+  char num_str[32];
+  sprintf(num_str, "%u", num);
+  for (char *p = num_str; *p; p++) {
+    gen(*p);
+  }
+}
+
+static void gen_rand_op() {
+  switch (choose(4)) {
+    case 0: gen('+'); break;
+    case 1: gen('-'); break;
+    case 2: gen('*'); break;
+    case 3: gen('/'); break;
+    case 4: gen('='); gen('='); break;
+  }
+}
+
 static void gen_rand_expr() {
-  buf[0] = '\0';
+
+    switch (choose(4)) {
+      case 0: gen_num(); break;
+      case 1: gen('('); gen_rand_expr(); gen(')'); break;
+      case 2: gen(' '); gen_rand_expr(); break;
+      default: 
+        gen_rand_expr(); 
+        gen_rand_op();
+        if(*(buf_ptr - 1) == '/')
+        {
+          char *last_ptr = buf_ptr; 
+          do
+          {
+            buf_ptr = last_ptr;
+            gen_num();
+          } while (*(buf_ptr - 1) == '0' && last_ptr == buf_ptr - 1);
+          
+        } 
+        else gen_rand_expr(); 
+        break;
+    }
 }
 
 int main(int argc, char *argv[]) {
@@ -44,6 +93,10 @@ int main(int argc, char *argv[]) {
   }
   int i;
   for (i = 0; i < loop; i ++) {
+
+    buf_ptr = buf;
+    memset(buf, 0, sizeof(buf));
+
     gen_rand_expr();
 
     sprintf(code_buf, code_format, buf);
@@ -63,7 +116,7 @@ int main(int argc, char *argv[]) {
     ret = fscanf(fp, "%d", &result);
     pclose(fp);
 
-    printf("%u %s\n", result, buf);
+    printf("%u\n%s\n", result, buf);
   }
   return 0;
 }
