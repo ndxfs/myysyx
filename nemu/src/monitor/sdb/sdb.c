@@ -198,13 +198,13 @@ static int cmd_pt(char *args) {
       continue;
     }
     word_t result = expr(expr_buf, &success);
-    if(success || result == expected)
+    if(success || (result == expected))
     {
-      printf("\033[32mline %d success, expect %u, result %u\033[0m\n", i, expected, result);
+      printf("\033[32mline %d \tsuccess\t, expect %u\t\t, result %u\033[0m\n", i, expected, result);
     } 
     else
     {
-      printf("\033[32mline %d fail, expect %u, result %u\033[0m\n", i, expected, result);
+      printf("\033[32mline %d \tfail\t, expect %u\t\t, result %u\033[0m\n", i, expected, result);
     }
   }
   fclose(fp);
