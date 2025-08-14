@@ -197,7 +197,7 @@ static int cmd_pt(char *args) {
       printf("line %d get error data - %s\n", i-1, result_buf);
       continue;
     }
-    word_t result = expr(args, &success);
+    word_t result = expr(expr_buf, &success);
     if(success || result == expected)
     {
       printf("\033[32mline %d success\033[0m\n", i);
