@@ -42,7 +42,7 @@ void gen(char c) {
 }
 
 static void gen_num() {
-  uint32_t num = rand() % (2^31);
+  uint32_t num = rand() % (1U << 31);
   char num_str[32];
   sprintf(num_str, "%u", num);
   for (char *p = num_str; *p; p++) {
@@ -117,7 +117,8 @@ int main(int argc, char *argv[]) {
     assert(compile_fp != NULL);
 
     char compile_output[8192] = {};
-    //size_t bytes_read = fread(compile_output, 1, sizeof(compile_output) - 1, compile_fp);
+    size_t bytes_read = fread(compile_output, 1, sizeof(compile_output) - 1, compile_fp);
+    (void)bytes_read;
     pclose(compile_fp);
 
     // 检查是否有溢出警告

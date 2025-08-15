@@ -174,7 +174,7 @@ static int cmd_pt(char *args) {
       printf("Unable to open the file\n");
       return 0;
   }
-	for(int i = 0; i < 1000; i++)
+	for(int i = 0; i < 500; i++)
   {
     if (!fgets(result_buf, sizeof(result_buf), fp)) 
     {
