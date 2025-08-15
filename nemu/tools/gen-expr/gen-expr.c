@@ -89,6 +89,7 @@ int has_overflow_warning(const char *compile_output) {
 }
 
 int main(int argc, char *argv[]) {
+  int count = 0;
   int seed = time(0);
   srand(seed);
   int loop = 1;
@@ -123,6 +124,8 @@ int main(int argc, char *argv[]) {
 
     // 检查是否有溢出警告
     if (has_overflow_warning(compile_output)) {
+      fprintf(stderr,"\033[33mline %d overflow, regenerate\n\033[0m", i);
+      i -= 1;
       continue; // 有警告，重新生成
     }
 
@@ -143,9 +146,11 @@ int main(int argc, char *argv[]) {
 
     if (ret == 1) {
       printf("%u\n%s\n", result, buf);
-      continue;
     }
+    count += 1;
+    fprintf(stderr,"\033[32mline %d create successfully\n\033[0m", i);
   }
+  fprintf(stderr,"Create %d express successfully\n", count);
   return 0;
 }
 // #include <stdint.h>
