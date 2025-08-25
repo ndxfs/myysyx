@@ -23,7 +23,7 @@
 
 
 enum {
-  TK_NOTYPE = 256, TK_ADD, TK_EQ, TK_SUB, TK_MUL, TK_DIV, TK_LB, TK_RB, TK_DEC_NUM, TK_HEX_NUM
+  TK_NOTYPE = 256, TK_ADD, TK_EQ, TK_SUB, TK_MUL, TK_DIV, TK_LB, TK_RB, TK_DEC_NUM, TK_HEX_NUM, TK_REG, TK_NEQ, TK_AND, TK_POINT, TK_NEG, TK_LEFT_SHIFT, TK_RIGHT_SHIFT,
 
   /* TODO: Add more token types */
 
@@ -48,7 +48,10 @@ static struct rule {
   {"\\)", TK_RB},                       // right_bracket
   {"0[Xx][0-9a-fA-F]+", TK_HEX_NUM},    // hex number
   {"[0-9]+", TK_DEC_NUM},               // dec number
-  
+	{"\\$[0-9a-fA-F]+", TK_REG},					// reg
+	{"!=", TK_NEQ},												// not equal
+	{"&&", TK_AND},												// and
+	{"", TK_POINT},												// point
 };
 
 #define NR_REGEX ARRLEN(rules)
@@ -118,12 +121,20 @@ static bool make_token(char *e) {
             tokens[nr_token].type = TK_EQ; 
             nr_token++;
             break;
+					case TK_NEQ:
+						tokens[nr_token].type = TK_NEQ;
+						nr_token++;
+						break;
           case TK_SUB:
-            tokens[nr_token].type = TK_SUB; 
+						if(nr_token == 0) tokens[nr_token].type = TK_NEG;
+						else if(tokens[nr_token - 1].type == TK_RB || tokens[nr_token - 1].type == TK_DEC_NUM || tokens[nr_token - 1].type == TK_HEX_NUM) tokens[nr_token].type = TK_SUB;
+						else tokens[nr_token].type = TK_NEG;	
             nr_token++;
             break;
           case TK_MUL:
-            tokens[nr_token].type = TK_MUL; 
+						if(nr_token == 0) tokens[nr_token].type = TK_POINT;
+						else if(tokens[nr_token - 1].type == TK_RB || tokens[nr_token - 1].type == TK_DEC_NUM || tokens[nr_token - 1].type == TK_HEX_NUM) tokens[nr_token].type = TK_MUL;
+						else tokens[nr_token].type = TK_POINT;
             nr_token++;
             break;
           case TK_DIV:
@@ -160,6 +171,22 @@ static bool make_token(char *e) {
             tokens[nr_token].type = TK_HEX_NUM; 
             nr_token++;
             break;
+					case TK_AND:
+						tokens[nr_token].type = TK_AND;
+						nr_token++;
+						break;
+					case TK_REG:
+						if(substr_len > 33)
+						{
+              printf("Error:this reg address is too long at position %d with len %d: %.*s\n", position - substr_len, substr_len, substr_len, substr_start);
+              return false;
+            }
+						strncpy(tokens[nr_token].str, substr_start + 1, substr_len - 1);
+            tokens[nr_token].str[substr_len - 1] = '\0';
+            tokens[nr_token].type = TK_REG;
+            nr_token++;
+						break;
+
           default: TODO();
         }
 
@@ -266,7 +293,7 @@ word_t eval(int p, int q, bool *state) {
   else {
     int op = -1;
     int bracket_count = 0;
-    int priority = 4;//优先级:== 0,+- 1,*/ 2,- 3,() 4
+    int priority = 7;//优先级:&& 0,==,!= 1,<< >> 2,+- 3,*/ 4,- 5,* 6,() 7
     word_t val1, val2;
     bool val1_state;
     bool val2_state;
@@ -274,100 +301,16 @@ word_t eval(int p, int q, bool *state) {
     {
       if(tokens[i].type == TK_LB) bracket_count += 1;
       else if(tokens[i].type == TK_RB) bracket_count -= 1;
-      else if(tokens[i].type != TK_DEC_NUM && tokens[i].type != TK_HEX_NUM && bracket_count == 0)
-      {
-        if(priority == 4)
-        {
-          if(tokens[i].type == TK_MUL || tokens[i].type == TK_DIV)
-          {
-            op = i;
-            priority = 2;
-          }
-          else if(tokens[i].type == TK_ADD)
-          {
-            op = i;
-            priority = 1;
-          }
-          else if(tokens[i].type == TK_SUB)
-          {
-            if(i != 0)
-            {
-              if(tokens[i-1].type == TK_DEC_NUM || tokens[i-1].type == TK_HEX_NUM || tokens[i-1].type == TK_RB)
-              {
-                op = i;
-                priority = 1;
-              }
-              else
-              {
-                op = i;
-                priority = 3;
-              }
-            }
-            else
-            {
-              op = i;
-              priority = 3;
-            }
-          }
-          else if(tokens[i].type == TK_EQ)
-          {
-            op = i;
-            priority = 0;
-          }
-        }
-        if(priority == 3)
-        {
-          if(tokens[i].type == TK_MUL || tokens[i].type == TK_DIV)
-          {
-            op = i;
-            priority = 2;
-          }
-          else if(tokens[i].type == TK_ADD)
-          {
-            op = i;
-            priority = 1;
-          }
-          else if(tokens[i].type == TK_SUB)
-          {
-            if(i != 0)
-            {
-              if(tokens[i-1].type == TK_DEC_NUM || tokens[i-1].type == TK_HEX_NUM)
-              {
-                op = i;
-                priority = 1;
-              }
-            }
-          }
-          else if(tokens[i].type == TK_EQ)
-          {
-            op = i;
-            priority = 0;
-          }
-
-        }
-        else if(priority == 2)
-        {
-          if(tokens[i].type == TK_ADD || tokens[i].type == TK_SUB)
-          {
-            op = i;
-            priority = 1;
-          }
-          else if(tokens[i].type == TK_EQ)
-          {
-            op = i;
-            priority = 0;
-          }
-
-        }
-        else if(priority == 1)
-        {
-          if(tokens[i].type == TK_EQ)
-          {
-            op = i;
-            priority = 0;
-          }
-        }
-      }
+			else if(bracket_count == 0)
+			{
+				if(priority > 6 && tokens[i].type == TK_POINT ) {op = i; priority = 6;}
+				else if(priority > 5 && tokens[i].type == TK_NEG ) {op = i; priority = 5;}
+				else if(priority > 4 && (tokens[i].type == TK_MUL || tokens[i].type == TK_DIV)) {op = i; priority = 4;}
+				else if(priority > 3 && (tokens[i].type == TK_ADD || tokens[i].type == TK_SUB)) {op = i; priority = 3;}
+				else if(priority > 2 && (tokens[i].type == TK_LEFT_SHIFT || tokens[i].type == TK_RIGHT_SHIFT)) {op = i; priority = 2;}
+				else if(priority > 1 && (tokens[i].type == TK_EQ || tokens[i].type == TK_NEQ)) {op = i; priority = 1;}
+				else if(priority > 0 && tokens[i].type == TK_AND) {op = i; priority = 0;}
+			}
 
     }
     if (op == -1)//未找到运算符
