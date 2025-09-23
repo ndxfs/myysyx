@@ -205,7 +205,7 @@ static bool make_token(char *e) {
         }
 
         Log("match rules[%d] = \"%s\" at position %d with len %d: %.*s.Type is %d",
-            i, rules[i].regex, position, substr_len, substr_len, substr_start, tokens[nr_token].type);
+            i, rules[i].regex, position, substr_len, substr_len, substr_start, tokens[nr_token - 1].type);
 
         break;
       }
