@@ -260,7 +260,7 @@ word_t eval(int p, int q, bool *state) {
     /* Bad expression */
   }
   else if (p == q) {
-    long x;
+    unsigned long x;
     char *endptr;
 
     *state = true;
