@@ -113,6 +113,7 @@ void free_wp_by_no(uint32_t no)
 		printf("Not find NO:%d\n", no);
 	}
 }
+
 void watchpoint_display(void)
 {
 	if(head == NULL)
@@ -131,3 +132,29 @@ void watchpoint_display(void)
 	}
 }
 
+bool watchpoint_check(void)
+{
+	if (head != NULL)
+	{
+		word_t new_value;
+		bool expr_state;
+		WP *tmp_watchpoint = head;
+		while(tmp_watchpoint != NULL)
+		{
+			new_value = expr(tmp_watchpoint -> watch_name, &expr_state);
+			if(expr_state == false)
+			{
+				printf("Your expr:%s may wrong\n", tmp_watchpoint -> watch_name);
+				return true;
+			}
+			else if(tmp_watchpoint -> old_value != new_value)
+			{
+				printf("Your watchpoint:%s(%d) is changed. old value:%d; new value:%d\n", tmp_watchpoint -> watch_name, tmp_watchpoint -> NO, tmp_watchpoint -> old_value, new_value);
+				tmp_watchpoint -> old_value = new_value;
+				return true;
+			}
+			tmp_watchpoint = tmp_watchpoint -> next;
+		}
+	}
+	return false;
+}
