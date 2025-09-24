@@ -43,7 +43,8 @@ WP* new_wp(char *watch_name)
 	if(free_ == NULL)
 	{
 		printf("No empty node to store watchpoint\n");
-		assert(0);
+		//assert(0);
+		return NULL;
 	}
 	else
 	{
@@ -52,6 +53,7 @@ WP* new_wp(char *watch_name)
 		head = new_node;
 		head -> NO = total_NO;
 		total_NO ++;
+		if(free_->next == NULL) printf("free watchpoint is almost empty \n");
 		free_ = free_ -> next;
 		if(free_ == NULL) printf("free watchpoint is almost empty \n");
 		strcpy(head -> watch_name, watch_name);
@@ -59,6 +61,7 @@ WP* new_wp(char *watch_name)
 		return head;
 	}
 }
+
 void free_wp(WP *wp)
 {
 	WP* prev_WP = NULL;
