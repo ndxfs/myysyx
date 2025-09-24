@@ -247,7 +247,7 @@ static int cmd_cm(char *args){//change memory value
 		return 0;
 	}
 
-	unsigned long addr_long = strtoul(arg0, &endptr, 10);
+	unsigned long addr_long = strtoul(arg0, &endptr, 0);
 	errno = 0;
 	if(errno == ERANGE || addr_long > UINT32_MAX || *endptr != '\0' || arg0 == endptr)
 	{
@@ -256,7 +256,7 @@ static int cmd_cm(char *args){//change memory value
 	else
 	{
 		errno = 0;
-		unsigned long long_value = strtoul(arg1, &endptr, 16);
+		unsigned long long_value = strtoul(arg1, &endptr, 0);
 		if(errno == ERANGE || long_value > UINT32_MAX || *endptr != '\0' || arg1 == endptr)
 		{
 			printf("Error: invalid parameter EXPR\n");
@@ -267,7 +267,7 @@ static int cmd_cm(char *args){//change memory value
 			vaddr_t addr = (vaddr_t)addr_long;
 			if(in_pmem(addr))
 			{
-        vaddr_write(addr, 1, value);
+        vaddr_write(addr, 4, value);
 			}
 			else
 			{
