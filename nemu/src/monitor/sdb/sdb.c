@@ -178,6 +178,7 @@ static int cmd_d(char *args) {
     if((errno == ERANGE || *endptr != '\0' || args == endptr) == 0) 
 		{
 			printf("Invalid data\n");
+      printf("Your data is %s\n", args);
 			return 0;
 		}
   }
