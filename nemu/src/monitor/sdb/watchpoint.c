@@ -53,6 +53,7 @@ WP* new_wp(char *watch_name)
 		head -> NO = total_NO;
 		total_NO ++;
 		free_ = free_ -> next;
+		if(free_ == NULL) printf("free watchpoint is almost empty \n");
 		strcpy(head -> watch_name, watch_name);
 		head -> old_value = 0;
 		return head;
