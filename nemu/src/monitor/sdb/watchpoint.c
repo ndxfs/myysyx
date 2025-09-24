@@ -139,6 +139,7 @@ bool watchpoint_check(void)
 		word_t new_value;
 		bool expr_state;
 		WP *tmp_watchpoint = head;
+		printf("watching point\n");
 		while(tmp_watchpoint != NULL)
 		{
 			new_value = expr(tmp_watchpoint -> watch_name, &expr_state);
