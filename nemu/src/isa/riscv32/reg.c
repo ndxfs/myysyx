@@ -45,3 +45,17 @@ word_t isa_reg_str2val(const char *s, bool *success) {
 	}
   return 0;
 }
+
+// //改变reg的值，目前该函数是为了测试监视点是否会触发
+// bool set_reg_value(const char *s, word_t reg_value)
+// {
+//   for(int i = 0; i < sizeof(regs)/sizeof(regs[0]); i++)	
+// 	{
+// 		if(strcmp(regs[i], s) == 0)
+// 		{
+// 			gpr(i) = reg_value;
+//       return true;
+// 		}
+// 	}
+//   return false;
+// }

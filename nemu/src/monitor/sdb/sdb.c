@@ -21,6 +21,7 @@
 #include <errno.h>
 #include "memory/vaddr.h"
 #include "memory/paddr.h"
+
 static int is_batch_mode = false;
 
 void init_regex();
@@ -234,6 +235,43 @@ static int cmd_pt(char *args) {
   return 0;
 }
 
+/*static int cmd_srv(char *args){//set reg value
+	char *endptr;
+	char *arg0 = strtok(NULL, " ");
+	char *arg1 = strtok(NULL, " ");
+
+	if(arg0 == NULL || arg1 == NULL)
+	{
+		printf("Need two parameters(reg_name, set_value)\n");
+		return 0;
+	}
+
+	bool is_reg_flag = false;
+  word_t old_value = isa_reg_str2val(arg0, &is_reg_flag);
+	if(is_reg_flag == false)
+	{
+		printf("Error: invalid reg name %s\n", arg0);
+    return 0;
+	}
+	else
+	{
+		errno = 0;
+		unsigned long ul_new_value = strtoul(arg1, &endptr, 0);
+		if(errno == ERANGE || ul_new_value > UINT32_MAX || *endptr != '\0' || arg1 == endptr)
+		{
+			printf("Error: invalid parameter EXPR\n");
+		}
+		else
+		{
+      word_t new_value = ul_new_value;
+      set_reg_value(arg0, new_value);
+			printf("Successfully change the reg %s's value from %u to %u", arg0, old_value, new_value);
+		}
+	}
+	return 0;
+
+}*/
+
 static struct {
   const char *name;
   const char *description;
@@ -249,6 +287,7 @@ static struct {
 	{ "w", "Set watchpoint", cmd_w},//wait list
 	{ "d", "Delete watchpoint", cmd_d},//wl
 	{ "pt", "Test the function evaluate EXPR", cmd_pt},
+  //{ "srv", "set regs value", cmd_srv},
   /* TODO: Add more commands */
 
 };

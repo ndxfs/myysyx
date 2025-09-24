@@ -31,5 +31,6 @@ static inline const char* reg_name(int idx) {
 }
 
 void isa_reg_display(void);
+bool set_reg_value(const char *s, word_t reg_value);
 
 #endif
