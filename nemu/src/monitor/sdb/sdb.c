@@ -175,7 +175,7 @@ static int cmd_d(char *args) {
   else
   {
     x = strtoul(args, &endptr, 10);
-    if((errno == ERANGE || *endptr != '\0' || args == endptr) == 0) 
+    if(errno == ERANGE || *endptr != '\0' || args == endptr) 
 		{
 			printf("Invalid data\n");
       printf("Your data is %s\n", args);
