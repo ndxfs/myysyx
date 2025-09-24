@@ -23,6 +23,7 @@ static WP wp_pool[NR_WP] = {};
 static WP *head = NULL, *free_ = NULL;
 
 void init_wp_pool() {
+	printf("Debug: init_wp_pool called\n");
   int i;
   for (i = 0; i < NR_WP; i ++) {
     wp_pool[i].NO = i;
@@ -39,6 +40,7 @@ void init_wp_pool() {
 static int total_NO=0;
 WP* new_wp(char *watch_name)
 {
+	printf("Debug: NR_WP = %d\n", NR_WP);
 	//TODO:NO更新
 	if(free_ == NULL)
 	{
