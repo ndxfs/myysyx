@@ -17,9 +17,12 @@
 #define __SDB_H__
 
 #include <common.h>
+#define WP_EXPR_MAX_LEN 50
 
 typedef struct watchpoint {
   int NO;
+	char watch_name[WP_EXPR_MAX_LEN];
+	word_t old_value;
   struct watchpoint *next;
 
   /* TODO: Add more members if necessary */
@@ -27,7 +30,8 @@ typedef struct watchpoint {
 } WP;
 
 word_t expr(char *e, bool *success);
-WP* new_wp();
+WP* new_wp(char *watch_name);
 void free_wp(WP *wp);
+void free_wp_by_no(uint32_t no);
 
 #endif

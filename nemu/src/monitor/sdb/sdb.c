@@ -149,18 +149,40 @@ static int cmd_w(char *args) {
   if(args == NULL) printf("Need one parameter\n");
   else
   {
-    TODO();
+		if(strlen(args) > WP_EXPR_MAX_LEN - 1)
+		{
+			printf("The length of args is %ld.It is too long\n", strlen(args));
+			return 0;
+		}
+		WP *new_node = new_wp(args);
+		if (new_node == NULL) return 0;//生成node失败
+		bool success = false;
+		new_node -> old_value = expr(args, &success);
+		if(success == false)
+		{
+			printf("Invalid expression: %s\n", args);
+			free_wp(new_node);
+		}
   }
 	
 	return 0;
 }
 
 static int cmd_d(char *args) {
+	uint32_t x = 0;
+	char *endptr;
   if(args == NULL) printf("Need one parameter\n");
   else
   {
-    TODO();
+    x = strtoul(args, &endptr, 10);
+    if((errno == ERANGE || *endptr != '\0' || args == endptr) == 0) 
+		{
+			printf("Invalid data\n");
+			return 0;
+		}
   }
+	free_wp_by_no(x);
+
 
 	return 0;
 }
@@ -223,8 +245,8 @@ static struct {
   { "info", "Print reg status with command 'r', print watchpoint with command 'w'", cmd_info},
 	{ "x", "Scan the memory with 4*N bytes from the address EXPR", cmd_x},
 	{ "p", "Evaluate EXPR", cmd_p},
-	{ "w", "Set watchpoint", cmd_w},
-	{ "d", "Delete watchpoint", cmd_d},
+	{ "w", "Set watchpoint", cmd_w},//wait list
+	{ "d", "Delete watchpoint", cmd_d},//wl
 	{ "pt", "Test the function evaluate EXPR", cmd_pt},
   /* TODO: Add more commands */
 
