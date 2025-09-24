@@ -235,6 +235,51 @@ static int cmd_pt(char *args) {
   return 0;
 }
 
+
+static int cmd_cm(char *args){//change memory value
+	char *endptr;
+	char *arg0 = strtok(NULL, " ");
+	char *arg1 = strtok(NULL, " ");
+
+	if(arg0 == NULL || arg1 == NULL)
+	{
+		printf("Need two parameters(memory_addr, new_value)\n");
+		return 0;
+	}
+
+	unsigned long addr_long = strtoul(arg0, &endptr, 10);
+	errno = 0;
+	if(errno == ERANGE || addr_long > UINT32_MAX || *endptr != '\0' || arg0 == endptr)
+	{
+		printf("Error: invalid parameter N\n");
+	}
+	else
+	{
+		errno = 0;
+		unsigned long long_value = strtoul(arg1, &endptr, 16);
+		if(errno == ERANGE || long_value > UINT32_MAX || *endptr != '\0' || arg1 == endptr)
+		{
+			printf("Error: invalid parameter EXPR\n");
+		}
+		else
+		{
+      word_t value = (word_t)long_value;
+			vaddr_t addr = (vaddr_t)addr_long;
+			if(in_pmem(addr))
+			{
+        vaddr_write(addr, 1, value);
+			}
+			else
+			{
+				printf("Error: wrong address\n");
+				printf("address = " FMT_PADDR " is out of bound of pmem [" FMT_PADDR ", " FMT_PADDR "] at pc = " FMT_WORD "\n", addr, PMEM_LEFT, PMEM_RIGHT, cpu.pc);
+			}
+		}
+	}
+  //pmem = malloc(CONFIG_MSIZE);
+	return 0;
+}
+
 /*static int cmd_srv(char *args){//set reg value
 	char *endptr;
 	char *arg0 = strtok(NULL, " ");
@@ -287,6 +332,7 @@ static struct {
 	{ "w", "Set watchpoint", cmd_w},//wait list
 	{ "d", "Delete watchpoint", cmd_d},//wl
 	{ "pt", "Test the function evaluate EXPR", cmd_pt},
+  { "cm", "change memory value", cmd_cm}
   //{ "srv", "set regs value", cmd_srv},
   /* TODO: Add more commands */
 
