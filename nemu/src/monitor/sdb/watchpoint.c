@@ -110,3 +110,21 @@ void free_wp_by_no(uint32_t no)
 		printf("Not find NO:%d\n", no);
 	}
 }
+void watchpoint_display(void)
+{
+	if(head == NULL)
+	{
+		printf("No watchpoints.\n");
+	}
+	else
+	{
+		printf("%-9s%-18s%-5s%-4s%-10s%s\n", "Num", "Type", "Disp", "Enb", "Address", "What");
+		WP *tmp_watchpoint = head;
+		while(tmp_watchpoint != NULL)
+		{
+			printf("%-9d%-18s%-5s%-4s%-10s%s\n", tmp_watchpoint -> NO, "hw watchpoint", "keep", "y", "", tmp_watchpoint -> watch_name);
+			tmp_watchpoint = tmp_watchpoint -> next;
+		}
+	}
+}
+

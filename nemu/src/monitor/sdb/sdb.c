@@ -67,7 +67,7 @@ static int cmd_info(char *args) {
 	if(args != NULL)
 	{
     if(strcmp(args, "r") == 0) isa_reg_display();
-    else if(strcmp(args, "w") == 0) TODO();
+    else if(strcmp(args, "w") == 0) watchpoint_display();
     else printf("Not find this command, please use \"help\" to find the usage of info\n");
   }
   else printf("Need one parameter\n");

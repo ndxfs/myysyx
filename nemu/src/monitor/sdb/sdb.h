@@ -33,5 +33,5 @@ word_t expr(char *e, bool *success);
 WP* new_wp(char *watch_name);
 void free_wp(WP *wp);
 void free_wp_by_no(uint32_t no);
-
+void watchpoint_display(void);
 #endif
