@@ -134,6 +134,7 @@ void watchpoint_display(void)
 
 bool watchpoint_check(void)
 {
+	printf("watching point ready\n");
 	if (head != NULL)
 	{
 		word_t new_value;
