@@ -134,13 +134,13 @@ void watchpoint_display(void)
 
 bool watchpoint_check(void)
 {
-	printf("watching point ready\n");
+	//printf("watching point ready\n");
 	if (head != NULL)
 	{
 		word_t new_value;
 		bool expr_state;
 		WP *tmp_watchpoint = head;
-		printf("watching point\n");
+		//printf("watching point\n");
 		while(tmp_watchpoint != NULL)
 		{
 			new_value = expr(tmp_watchpoint -> watch_name, &expr_state);

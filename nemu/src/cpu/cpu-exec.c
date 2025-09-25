@@ -42,7 +42,7 @@ static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
   IFDEF(CONFIG_DIFFTEST, difftest_step(_this->pc, dnpc));
 
 #ifdef CONFIG_WATCHPOINT 
-  printf("prewatching point ready\n");
+  //printf("prewatching point ready\n");
   watchpoint_flag = watchpoint_check();
   if (watchpoint_flag) nemu_state.state = NEMU_STOP;
 #endif
