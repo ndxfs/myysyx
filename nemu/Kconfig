@@ -191,6 +191,16 @@ config DIFFTEST_REF_NAME
   default "kvm" if DIFFTEST_REF_KVM
   default "spike" if DIFFTEST_REF_SPIKE
   default "none"
+
+config WATCHPOINT
+bool "Enable watchpoint support"
+default n
+help
+  Enable watchpoint feature to monitor changes of expressions or memory values.
+  When enabled, you can use 'w' command to set watchpoints, and NEMU will pause
+  execution when the watched value changes. Disable this to improve performance
+  when not debugging.
+
 endmenu
 
 if MODE_SYSTEM
