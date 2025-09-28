@@ -13,12 +13,18 @@
 # See the Mulan PSL v2 for more details.
 #**************************************************************************************/
 
+
+.DEFAULT_GOAL := all
+
+.PHONY: all
+all: count_lines $(NAME)
+
 #统计代码行数
 .PHONY: count_lines
 count_lines:
 	@echo "Total lines of .c and .h files:"
 	find . \( -name "*.c" -o -name "*.h" \) -exec wc -l {} + | grep "total"
-  
+
 # Sanity check
 ifeq ($(wildcard $(NEMU_HOME)/src/nemu-main.c),)
   $(error NEMU_HOME=$(NEMU_HOME) is not a NEMU repo)
