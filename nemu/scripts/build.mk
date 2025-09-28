@@ -47,7 +47,7 @@ $(OBJ_DIR)/%.o: %.cc
 
 .PHONY: app clean
 
-app: count_lines $(BINARY)
+app: $(BINARY) count_lines
 
 $(BINARY):: $(OBJS) $(ARCHIVES)
 	@echo + LD $@
