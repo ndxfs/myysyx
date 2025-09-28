@@ -58,11 +58,7 @@ count_lines:
 	@echo "Total lines of .c and .h files:"
 	@find . \( -name "*.c" -o -name "*.h" \) -exec wc -l {} + | grep "total"
 	@echo "Total lines without empty of .c and .h files:"
-	@find . \( -name "*.c" -o -name "*.h" \) -exec sh -c '
-	  for file in "$@"; do
-	    # 过滤空行并统计，用 grep -c 直接计数（替代 wc -l，更简洁）
-	    grep -v "^$" "$file" | wc -l
-	  done
-	' sh {} + | awk '{sum += $$1} END {print sum}'  # 用 $$1 替代 $1，避免 Make 解析
+	@find . \( -name "*.c" -o -name "*.h" \) -exec cat {} \; | grep -v '^$$' | wc -l
+
 clean:
 	-rm -rf $(BUILD_DIR)
