@@ -13,6 +13,7 @@
 # See the Mulan PSL v2 for more details.
 #**************************************************************************************/
 
+
 # Sanity check
 ifeq ($(wildcard $(NEMU_HOME)/src/nemu-main.c),)
   $(error NEMU_HOME=$(NEMU_HOME) is not a NEMU repo)
@@ -61,3 +62,9 @@ else
 # Include rules to build NEMU
 include $(NEMU_HOME)/scripts/native.mk
 endif
+
+#统计代码行数
+.PHONY: count_lines
+count_lines:
+	@echo "Total lines of .c and .h files:"  # 打印提示信息（可选）
+	find . \( -name "*.c" -o -name "*.h" \) -exec wc -l {} + | grep "total"
