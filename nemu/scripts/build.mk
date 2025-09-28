@@ -55,8 +55,14 @@ $(BINARY):: $(OBJS) $(ARCHIVES)
 
 #统计代码行数
 count_lines:
-#@echo "Total lines of .c and .h files:"
-	find . \( -name "*.c" -o -name "*.h" \) -exec wc -l {} + | grep "total"
+	@echo "Total lines of .c and .h files:"
+	@find . \( -name "*.c" -o -name "*.h" \) -exec wc -l {} + | grep "total"
+	@echo "Total lines without empty of .c and .h files:"
+	@find . \( -name "*.c" -o -name "*.h" \) -exec sh -c '
+	  for file do
+	    cat "$file" | grep -v "^$" | wc -l  # 单个文件：读内容→滤空行→统计非空行
+	  done
+	' sh {} + | awk '{sum += $1} END {print "Total non-empty lines: " sum}' | grep -s .
 
 clean:
 	-rm -rf $(BUILD_DIR)
