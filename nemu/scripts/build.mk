@@ -55,7 +55,7 @@ $(BINARY):: $(OBJS) $(ARCHIVES)
 
 #统计代码行数
 count_lines:
-	@echo "Total lines of .c and .h files:"
+#@echo "Total lines of .c and .h files:"
 	find . \( -name "*.c" -o -name "*.h" \) -exec wc -l {} + | grep "total"
 
 clean:
