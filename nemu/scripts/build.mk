@@ -47,11 +47,16 @@ $(OBJ_DIR)/%.o: %.cc
 
 .PHONY: app clean
 
-app: $(BINARY)
+app: count_lines $(BINARY)
 
 $(BINARY):: $(OBJS) $(ARCHIVES)
 	@echo + LD $@
 	@$(LD) -o $@ $(OBJS) $(LDFLAGS) $(ARCHIVES) $(LIBS)
+
+#统计代码行数
+count_lines:
+	@echo "Total lines of .c and .h files:"
+	find . \( -name "*.c" -o -name "*.h" \) -exec wc -l {} + | grep "total"
 
 clean:
 	-rm -rf $(BUILD_DIR)
