@@ -55,8 +55,10 @@ $(BINARY):: $(OBJS) $(ARCHIVES)
 
 #统计代码行数
 count_lines:
-#@echo "Total lines of .c and .h files:"
-	find . \( -name "*.c" -o -name "*.h" \) -exec wc -l {} + | grep "total"
+	@echo "Total lines of .c and .h files:"
+	@find . \( -name "*.c" -o -name "*.h" \) -exec wc -l {} + | grep "total"
+	@echo "Total lines without empty of .c and .h files:"
+	@find . \( -name "*.c" -o -name "*.h" \) -exec cat {} \; | grep -v '^$$' | wc -l
 
 clean:
 	-rm -rf $(BUILD_DIR)
