@@ -67,3 +67,8 @@ include $(NEMU_HOME)/scripts/native.mk
 endif
 
 
+compile_commands:
+	@mkdir -p build  # 确保 build 目录存在（防止移动时报错）
+	@compiledb make -f Makefile  #生成 json 文件
+	@mv compile_commands.json build/  #移到 build 目录
+	@echo "编译数据库已生成：build/compile_commands.json"   
