@@ -9,3 +9,4 @@
 #include "Vmux21___024root__DepSet_h29d86a80__0__Slow.cpp"
 #include "Vmux21__Syms.cpp"
 #include "Vmux21__Trace__0__Slow.cpp"
+#include "Vmux21__TraceDecls__0__Slow.cpp"

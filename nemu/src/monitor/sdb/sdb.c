@@ -53,13 +53,13 @@ static int cmd_c(char *args) {
 
 static int cmd_q(char *args) {
 	nemu_state.state = NEMU_QUIT;
-  return -1;
+	return -1;
 }
 
 static int cmd_help(char *args);
 
 static int cmd_si(char *args) {
-  if(args == NULL) cpu_exec(1);
+	if(args == NULL) cpu_exec(1);
 	else cpu_exec(atoi(args));
 	return 0;
 }
@@ -67,11 +67,11 @@ static int cmd_si(char *args) {
 static int cmd_info(char *args) {
 	if(args != NULL)
 	{
-    if(strcmp(args, "r") == 0) isa_reg_display();
-    else if(strcmp(args, "w") == 0) watchpoint_display();
-    else printf("Not find this command, please use \"help\" to find the usage of info\n");
-  }
-  else printf("Need one parameter\n");
+		if(strcmp(args, "r") == 0) isa_reg_display();
+		else if(strcmp(args, "w") == 0) watchpoint_display();
+		else printf("Not find this command, please use \"help\" to find the usage of info\n");
+	}
+	else printf("Need one parameter\n");
     return 0;
 }
 
@@ -280,61 +280,25 @@ static int cmd_cm(char *args){//change memory value
 	return 0;
 }
 
-/*static int cmd_srv(char *args){//set reg value
-	char *endptr;
-	char *arg0 = strtok(NULL, " ");
-	char *arg1 = strtok(NULL, " ");
-
-	if(arg0 == NULL || arg1 == NULL)
-	{
-		printf("Need two parameters(reg_name, set_value)\n");
-		return 0;
-	}
-
-	bool is_reg_flag = false;
-  word_t old_value = isa_reg_str2val(arg0, &is_reg_flag);
-	if(is_reg_flag == false)
-	{
-		printf("Error: invalid reg name %s\n", arg0);
-    return 0;
-	}
-	else
-	{
-		errno = 0;
-		unsigned long ul_new_value = strtoul(arg1, &endptr, 0);
-		if(errno == ERANGE || ul_new_value > UINT32_MAX || *endptr != '\0' || arg1 == endptr)
-		{
-			printf("Error: invalid parameter EXPR\n");
-		}
-		else
-		{
-      word_t new_value = ul_new_value;
-      set_reg_value(arg0, new_value);
-			printf("Successfully change the reg %s's value from %u to %u", arg0, old_value, new_value);
-		}
-	}
-	return 0;
-
-}*/
 
 static struct {
-  const char *name;
-  const char *description;
-  int (*handler) (char *);
-} cmd_table [] = {
-  { "help", "Display information about all supported commands", cmd_help },
-  { "c", "Continue the execution of the program", cmd_c },
-  { "q", "Exit NEMU", cmd_q },
-  { "si", "Continue the execution of the program with one step or more steps(N)", cmd_si},
-  { "info", "Print reg status with command 'r', print watchpoint with command 'w'", cmd_info},
+	const char *name;
+	const char *description;
+	int (*handler) (char *);
+}	cmd_table [] = {
+	{ "help", "Display information about all supported commands", cmd_help },
+	{ "c", "Continue the execution of the program", cmd_c },
+	{ "q", "Exit NEMU", cmd_q },
+	{ "si", "Continue the execution of the program with one step or more steps(N)", cmd_si},
+	{ "info", "Print reg status with command 'r', print watchpoint with command 'w'", cmd_info},
 	{ "x", "Scan the memory with 4*N bytes from the address EXPR", cmd_x},
 	{ "p", "Evaluate EXPR", cmd_p},
 	{ "w", "Set watchpoint", cmd_w},//wait list
 	{ "d", "Delete watchpoint", cmd_d},//wl
 	{ "pt", "Test the function evaluate EXPR", cmd_pt},
-  { "cm", "change memory value", cmd_cm}
-  //{ "srv", "set regs value", cmd_srv},
-  /* TODO: Add more commands */
+	{ "cm", "change memory value", cmd_cm}
+	//{ "srv", "set regs value", cmd_srv},
+	/* TODO: Add more commands */
 
 };
 
@@ -371,7 +335,7 @@ void sdb_mainloop() {
   if (is_batch_mode) {
     cmd_c(NULL);
     return;
-  }
+  } 
 
   for (char *str; (str = rl_gets()) != NULL; ) {
     char *str_end = str + strlen(str);

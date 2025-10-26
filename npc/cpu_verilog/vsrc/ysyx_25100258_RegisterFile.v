@@ -26,5 +26,5 @@ module ysyx_25100258_RegisterFile  (
   end
   //读出
   assign rdata1 = (raddr1 == 5'b0) ? 32'd0 : rf[raddr1]; 
-  assign rdata2 = (raddr2 == 5'b0) ? 32'd0 : rf[raadr2];
+  assign rdata2 = (raddr2 == 5'b0) ? 32'd0 : rf[raddr2];
 endmodule

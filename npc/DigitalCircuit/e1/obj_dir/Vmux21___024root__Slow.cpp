@@ -2,8 +2,7 @@
 // DESCRIPTION: Verilator output: Design implementation internals
 // See Vmux21.h for the primary calling header
 
-#include "verilated.h"
-
+#include "Vmux21__pch.h"
 #include "Vmux21__Syms.h"
 #include "Vmux21___024root.h"
 
@@ -18,7 +17,7 @@ Vmux21___024root::Vmux21___024root(Vmux21__Syms* symsp, const char* v__name)
 }
 
 void Vmux21___024root::__Vconfigure(bool first) {
-    if (false && first) {}  // Prevent unused
+    (void)first;  // Prevent unused variable warning
 }
 
 Vmux21___024root::~Vmux21___024root() {

@@ -7,8 +7,10 @@ output			[3:0]		Result,
 output							Carry,
 output							Overflow
 );
-
+//测试vh文件使用
+//`include "param.vh"
 wire [3:0]	t_add_Cin;
+//assign			t_add_Cin =({4{Cin}} ^ B)+ {ZERO, ZERO, ZERO, Cin};
 assign			t_add_Cin =({4{Cin}} ^ B)+ {3'b000, Cin};
 assign			{ Carry, Result } = A + t_add_Cin;
 assign			Overflow = (A[3] == t_add_Cin[3]) && (Result [3] != A[3]);

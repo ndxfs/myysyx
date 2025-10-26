@@ -7,9 +7,10 @@
 
 #include "verilated.h"
 
+
 class Vmux21__Syms;
 
-class Vmux21___024root final : public VerilatedModule {
+class alignas(VL_CACHE_LINE_BYTES) Vmux21___024root final : public VerilatedModule {
   public:
 
     // DESIGN SPECIFIC STATE
@@ -17,9 +18,9 @@ class Vmux21___024root final : public VerilatedModule {
     VL_IN8(b,0,0);
     VL_IN8(s,0,0);
     VL_OUT8(y,0,0);
+    CData/*0:0*/ __VstlFirstIteration;
+    CData/*0:0*/ __VicoFirstIteration;
     CData/*0:0*/ __VactContinue;
-    IData/*31:0*/ __VstlIterCount;
-    IData/*31:0*/ __VicoIterCount;
     IData/*31:0*/ __VactIterCount;
     VlTriggerVec<1> __VstlTriggered;
     VlTriggerVec<1> __VicoTriggered;
@@ -36,7 +37,7 @@ class Vmux21___024root final : public VerilatedModule {
 
     // INTERNAL METHODS
     void __Vconfigure(bool first);
-} VL_ATTR_ALIGNED(VL_CACHE_LINE_BYTES);
+};
 
 
 #endif  // guard

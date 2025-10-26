@@ -9,6 +9,12 @@ VERILATOR_CFLAGS += -MMD --build -cc \
 OBJ_DIR = $(BUILD_DIR)/obj_dir
 BIN = $(BUILD_DIR)/$(TOPNAME)
 
+barrel_shifter:./vsrc/barrel_shifter.v ./csrc/tb_barrel_shifter.cpp ./vsrc/mux4_1.v
+	verilator -Wall --trace -cc ./vsrc/barrel_shifter.v ./vsrc/mux4_1.v --exe ./csrc/tb_barrel_shifter.cpp
+	make -C obj_dir -f Vbarrel_shifter.mk Vbarrel_shifter
+	./obj_dir/Vbarrel_shifter
+	gtkwave barrel_shifter.vcd
+
 top_shift: $(BIN)
 
 $(shell mkdir -p $(BUILD_DIR))

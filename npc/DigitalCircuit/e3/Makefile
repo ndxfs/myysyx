@@ -10,7 +10,7 @@ OBJ_DIR = $(BUILD_DIR)/obj_dir
 BIN = $(BUILD_DIR)/$(TOPNAME)
 
 addsub:./vsrc/addsub.v ./csrc/tb_addsub.cpp
-	verilator -Wall --trace	-cc ./vsrc/addsub.v --exe ./csrc/tb_addsub.cpp
+	verilator -Wall --trace	-cc ./vsrc/addsub.v -I./vsrc --exe ./csrc/tb_addsub.cpp
 	make -C obj_dir -f Vaddsub.mk Vaddsub
 	./obj_dir/Vaddsub
 	gtkwave addsub.vcd

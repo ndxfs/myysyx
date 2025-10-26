@@ -17,7 +17,7 @@
 #include "Vmux21___024root.h"
 
 // SYMS CLASS (contains all model state)
-class Vmux21__Syms final : public VerilatedSyms {
+class alignas(VL_CACHE_LINE_BYTES)Vmux21__Syms final : public VerilatedSyms {
   public:
     // INTERNAL STATE
     Vmux21* const __Vm_modelp;
@@ -35,6 +35,6 @@ class Vmux21__Syms final : public VerilatedSyms {
 
     // METHODS
     const char* name() { return TOP.name(); }
-} VL_ATTR_ALIGNED(VL_CACHE_LINE_BYTES);
+};
 
 #endif  // guard
