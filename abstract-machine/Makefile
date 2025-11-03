@@ -146,6 +146,7 @@ endif
 -include $(addprefix $(DST_DIR)/, $(addsuffix .d, $(basename $(SRCS))))
 
 ## 6. Miscellaneous
+#目前不可用，改用了bear -- make -B ARCH=riscv32-nemu ALL=dummy
 
 compile_commands:
 	@mkdir -p build  # 确保 build 目录存在（防止移动时报错）

@@ -25,22 +25,88 @@
  * You can modify this value as you want.
  */
 #define MAX_INST_TO_PRINT 10
+#define MAX_IRINGBF 16
+
+typedef struct{
+	char logs[MAX_IRINGBF][128];
+	vaddr_t pcs[MAX_IRINGBF];
+	int head;
+	int tail;
+	int count;
+} IRingBuf;
 
 CPU_state cpu = {};
 uint64_t g_nr_guest_inst = 0;
 static uint64_t g_timer = 0; // unit: us
 static bool g_print_step = false;
 static bool watchpoint_flag = false;
+static IRingBuf iringbuf;
 
 void device_update();
 
+void init_iringbuf() {
+	iringbuf.head = 0;
+	iringbuf.tail = 0;
+	iringbuf.count = 0;
+	memset(iringbuf.logs, 0, sizeof(iringbuf.logs));
+}
+
+void record_error_instruction(vaddr_t pc){
+	if (iringbuf.count < MAX_IRINGBF) {
+        	iringbuf.count++;
+    	} else {
+        	iringbuf.head = (iringbuf.head + 1) % MAX_IRINGBF;
+    	}
+    
+    	char error_log[128];
+    	snprintf(error_log, sizeof(error_log), "0x%08x: <memory access error>", pc);
+    
+    	strcpy(iringbuf.logs[iringbuf.tail], error_log);
+    	iringbuf.pcs[iringbuf.tail] = pc;
+    	iringbuf.tail = (iringbuf.tail + 1) % MAX_IRINGBF;
+}
+
+void print_iringbuf(vaddr_t pc) {
+	int index;
+	
+	printf("Instructions ringbuffer recorded %d instructions-----------------\n", iringbuf.count);
+	if(iringbuf.count == 0) {
+		printf("No instruction recorded\n");
+		return;
+	}
+
+	for (int i = 0; i < iringbuf.count; i++){
+		index = (iringbuf.head + i) % MAX_IRINGBF;
+		if (iringbuf.pcs[index] == pc) printf("--> ");
+		else printf("    ");
+		printf("%s\n", iringbuf.logs[index]);
+	}
+	printf("----------------------------------------------------------------\n");
+}
+
 static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
 #ifdef CONFIG_ITRACE_COND
-  if (ITRACE_COND) { log_write("%s\n", _this->logbuf); }
+  if (ITRACE_COND) { \
+	  log_write("%s\n", _this->logbuf); 
+	  if(iringbuf.count < MAX_IRINGBF){
+		  iringbuf.count++;
+	  }
+	  else {
+		  iringbuf.head = (iringbuf.head + 1) % MAX_IRINGBF;
+	  }
+
+	  strcpy(iringbuf.logs[iringbuf.tail], _this->logbuf);
+	  iringbuf.pcs[iringbuf.tail] = _this->pc;
+	  iringbuf.tail = (iringbuf.tail + 1) % MAX_IRINGBF;
+  }
 #endif
   if (g_print_step) { IFDEF(CONFIG_ITRACE, puts(_this->logbuf)); }
   IFDEF(CONFIG_DIFFTEST, difftest_step(_this->pc, dnpc));
 
+#ifdef CONFIG_FTRACE_COND
+  void check_function_call_or_return(Decode *s);
+  check_function_call_or_return(_this);
+#endif
 #ifdef CONFIG_WATCHPOINT 
   //printf("prewatching point ready\n");
   watchpoint_flag = watchpoint_check();
