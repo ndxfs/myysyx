@@ -2,26 +2,14 @@
 #include <klib.h>
 #include <klib-macros.h>
 #include <stdarg.h>
+#include <unistd.h>//用于write
 
 #if !defined(__ISA_NATIVE__) || defined(__NATIVE_USE_KLIB__)
-
-int printf(const char *fmt, ...) {
-	panic("Not implemented");
-}
+#define PRINTF_BUF_SIZE 4096
 
 int vsprintf(char *out, const char *fmt, va_list ap) {
-	panic("Not implemented");
-}
-
-int sprintf(char *out, const char *fmt, ...) {
-	va_list ap;
-	int d;
-	char c;
-	char *s;
 	char *p = out;
-	
-	
-	va_start(ap, fmt);
+
 	while (*fmt){
 		if(*fmt != '%')
 			*p++ = *fmt++;
@@ -29,11 +17,16 @@ int sprintf(char *out, const char *fmt, ...) {
 		{
 			switch (*++fmt) {
 			case 's':/* string */
+			{
+				char *s;
 				s = va_arg(ap, char *);
 				strcpy(p, s);
 				p += strlen(s);
 				break;
+			}
 			case 'd':/* int */
+			{
+				int d;
 				char buf[20];
 				char *buf_p = buf + 19;
 				int is_neg = 0;
@@ -47,7 +40,7 @@ int sprintf(char *out, const char *fmt, ...) {
 				if (d < 0) {
 					is_neg = 1;
 					num = (unsigned int)-d; 			
-				}
+				} 
 				else num = (unsigned int)d;
 	
 	
@@ -70,23 +63,53 @@ int sprintf(char *out, const char *fmt, ...) {
 				strcpy(p, buf_p);
 				p += strlen(buf_p);
 				break;
+			}
 			case 'c':/* char */
 				/* need a cast here since va_arg only
-				takes fully promoted types */
+				ta kes fully promoted types */
+			{
+				char c;
 				c = (char) va_arg(ap, int);
 				*p++ = c;
 				break;
+			}
 			default: 
+			{
                 *p++ = '%';
                 *p++ = *fmt;
                 break;
 			}
+			}
 		fmt++;
 		}
 	}
-	va_end(ap);
 	*p = '\0';
 	return p - out;
+	//panic("Not implemented");
+}
+
+int printf(const char *fmt, ...) {
+	char buf[PRINTF_BUF_SIZE];
+	va_list ap;
+	va_start(ap, fmt);
+	int ret = vsprintf(buf, fmt, ap);
+	va_end(ap);
+#ifdef __ISA_NATIVE__
+	if(ret > 0) write(STDOUT_FILENO, buf, ret);
+#endif
+
+	return ret;
+	//panic("Not implemented");
+}
+
+
+int sprintf(char *out, const char *fmt, ...) {
+	va_list ap;
+	int len = 0;
+	va_start(ap, fmt);
+	len = vsprintf(out, fmt, ap);
+	va_end(ap);
+	return len;
  	
 	//panic("Not implemented");
 }

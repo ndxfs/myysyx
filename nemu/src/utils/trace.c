@@ -167,7 +167,7 @@ void check_function_call_or_return(Decode *s)
 		if(func_index > 0) func_index--;
 		//return 1;
     }
-	else  if ((s->isa.inst & 0x707F) == 0x6F || (s->isa.inst & 0x7F) == 0x67) //jal/jalr
+	else  if ((s->isa.inst & 0x707F) == 0x67 || (s->isa.inst & 0x7F) == 0x6F) //jal/jalr
 	{
 		if(strcmp(addr_to_func_name_start(s->dnpc),"???") != 0)
 		{
@@ -176,6 +176,10 @@ void check_function_call_or_return(Decode *s)
 			printf(FMT_WORD":%*c call [%s@" FMT_WORD "]\n", s->pc, func_index, ' ', func_name, s->dnpc);
 			//return 2;
 		}
+		//else 
+		//{
+		//	printf("Not function call:pc"FMT_WORD"  next_pc:"FMT_WORD"\n", s->pc, s->dnpc);
+		//}
 	}
 	//return 0;//no call no return;
 	//暂时不写返回值了，等到用的话再加

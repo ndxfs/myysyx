@@ -18,7 +18,17 @@
 #include "../local-include/reg.h"
 
 bool isa_difftest_checkregs(CPU_state *ref_r, vaddr_t pc) {
-  return false;
+	int idx = MUXDEF(CONFIG_RVE, 16, 32);
+	for(int i = idx - 1; i >= 0; i--)
+	{
+		if(ref_r->gpr[i] != gpr(i))
+		{
+			printf("difftest error:the reg = %s is not equal between DUT and REF. DUT value is 0x%x while REF value is 0x%x at pc = " FMT_WORD "\n", reg_name(i), gpr(i), ref_r->gpr[i], pc);
+			return false;
+		}
+	}
+	if(ref_r->pc != pc) printf("difftest error:DUT pc is not equal with REF pc at DUT pc = " FMT_WORD ";REF pc =" FMT_WORD "\n", pc, ref_r->pc);
+	return true;
 }
 
 void isa_difftest_attach() {
