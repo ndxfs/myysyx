@@ -5,27 +5,36 @@ TOP := ysyx_25100258_cpu
 BUILD_DIR = build
 # 源文件
 VSRC = $(wildcard vsrc/*.v)
-CSRC = $(wildcard src/**/*.c src/*.c src/*.cpp)
+
+DIRS-y := src src/isa src/engine/interpreter src/utils src/monitor src/memory
+DIRS-BLACKLIST-y += $(DIRS-BLACKLIST)
+SRCS-BLACKLIST-y += $(SRCS-BLACKLIST) $(shell find -L $(DIRS-BLACKLIST-y) -name "*.c" | sort -u)  
+SRCS-y += $(shell find -L $(DIRS-y) -name "*.c")  
+CSRC = $(filter-out $(SRCS-BLACKLIST-y),$(SRCS-y))  
+CXXSRC = $(wildcard src/isa/*.cpp)
 
 
+BUILD_MODE ?= release
+CXXFLAGS_BASE = -std=c++14
+ifeq ($(BUILD_MODE),debug)
+  CXXFLAGS_EXTRA = -g -O0
+else
+  CXXFLAGS_EXTRA = -O2
+endif
+
+NPC_EXEC = $(BUILD_DIR)/V$(TOP)
+VERILATOR_MK = $(BUILD_DIR)/V$(TOP).mk
+BUILD_DEPS = $(BUILD_DIR)/.build_deps
+
+include scripts/build.mk
+include scripts/native.mk
 # 主目标
-all: npc-am
+all: npc
 
-npc-am: $(VSRC) $(CSRC)
-	$(VERILATOR) $(VERILATOR_FLAGS) \
-		--top-module $(TOP) \
-		-I./vsrc \
-		--Mdir $(BUILD_DIR) \
-		-CFLAGS "-I$(PWD)/include -I$(PWD)/$(BUILD_DIR)" \
-		--cc $(VSRC) \
-		--exe $(CSRC) \
+npc: $(BINARY)
 
-	make -C $(BUILD_DIR) -f V$(TOP).mk
-
-run: npc-am
-	$(BUILD_DIR)/V$(TOP)
 
 clean:
 	rm -rf $(BUILD_DIR)
 
-.PHONY: all run clean
+.PHONY: clean gdb

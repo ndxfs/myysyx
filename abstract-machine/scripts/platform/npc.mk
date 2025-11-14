@@ -8,6 +8,7 @@ AM_SRCS := riscv/npc/start.S \
            platform/dummy/vme.c \
            platform/dummy/mpe.c
 
+NPCFLAGS += -l $(shell dirname $(IMAGE).elf)/npc-log.txt
 CFLAGS    += -fdata-sections -ffunction-sections
 LDSCRIPTS += $(AM_HOME)/scripts/linker.ld
 LDFLAGS   += --defsym=_pmem_start=0x80000000 --defsym=_entry_offset=0x0
@@ -26,6 +27,7 @@ image: image-dep
 	@$(OBJCOPY) -S --set-section-flags .bss=alloc,contents -O binary $(IMAGE).elf $(IMAGE).bin
 
 run: insert-arg
-	echo "TODO: add command here to run simulation"
+	$(MAKE) -C $(NPC_HOME)/cpu_npc ISA=$(ISA) run ARGS="$(NPCFLAGS)" IMG=$(IMAGE).bin 
+	#echo "TODO: add command here to run simulation"
 
 .PHONY: insert-arg

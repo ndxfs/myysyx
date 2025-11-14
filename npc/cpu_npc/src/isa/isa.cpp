@@ -1,7 +1,8 @@
-#include "cpu.h"
+#include <verilated_connect.h>
+#include <cpu/decode.h>
+#include <cpu/ifetch.h>
 
-
-uint32_t inst[INST_NUMBER] = {
+/*uint32_t inst[INST_NUMBER] = {
   // 32条addi指令：格式为 addi rd, rs1, imm（用x0做rs1，直接给rd赋值imm，易观察）
   0x00100093,  // 0: addi x1, x0, 1    (pc=0x80000000 → 索引0)
   0x00200113,  // 1: addi x2, x0, 2    (pc=0x80000004 → 索引1)
@@ -36,17 +37,16 @@ uint32_t inst[INST_NUMBER] = {
   0x01f00f93,  // 30: addi x31, x0, 31 （RISC-V只有x0-x31，最后一条用x31）
   0x02000013,  // 31: addi x0, x0, 32 （x0写不进去，验证“写x0无效”特性）
   0x00100073,  //ebreak
-};
+};*/
 
 
-int sim_flag = 1;
 static Vysyx_25100258_cpu* top;
 uint32_t regs[32];
 
 extern "C" void ebreak_call(){
 	printf("ebreak call, sim end.\n");
 	printf("at pc : 0x%x\n", top->pc);
-	sim_flag = 0;
+	npc_state.state = NPC_END;
 }
 
 void read_all_register(){
@@ -79,9 +79,14 @@ void sim_exit(){
 	delete top;
 }
 
-void cpu_one_step(){
-	top->inst_in = inst[(top->pc - 0x80000000)/4];
+int isa_exec_once(Decode *s){
+	uint32_t inst_in = inst_fetch(&top->pc, 4);
+	top->inst_in = inst_fetch(&top->pc, 4);
+	//top->inst_in = inst[(top->pc - 0x80000000)/4];
 	single_cycle();
+	s->pc = top->pc;
+	printf("pc" FMT_WORD "\n", s->pc);
+	return 0;
 }
 
 /*int main() {

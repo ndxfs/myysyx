@@ -8,10 +8,10 @@
 #define INST_NUMBER 33
 
 
-extern uint32_t inst[INST_NUMBER];
+//extern uint32_t inst[INST_NUMBER];
 
-extern int sim_flag;
-extern "C" void ebreak_call(void);
+//extern int sim_flag;
+extern void ebreak_call(void);
 
 void read_all_register(void);
 
@@ -23,5 +23,5 @@ void sim_init(void);
 
 void sim_exit(void);
 
-void cpu_one_step(void);
+//void cpu_one_step(void);
 

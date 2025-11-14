@@ -13,12 +13,16 @@ module ysyx_25100258_cpu(
 	//	$display("%d", reg_addr);
 	//endtask
 	wire	[31:0]	inst;
+	wire	[31:0]	exu_data;
+	wire	[31:0]	nextpc;
+
 
 	ysyx_25100258_IFU u_IFU(
 		.clk(clk),
 		.rst(rst),
 		.inst_in(inst_in),
 		.inst(inst),
+		.nextpc(nextpc),
 		.pc(pc)
 	);
 
@@ -41,7 +45,6 @@ module ysyx_25100258_cpu(
 	);
 
 	wire			reg_wen;
-	wire	[31:0]	exu_data;
 	ysyx_25100258_EXU u_EXU(
 		.inst_out(inst_out),	
 		.inst_type(inst_type),
@@ -51,7 +54,8 @@ module ysyx_25100258_cpu(
 		.imm(imm),
 		.reg_wen(reg_wen),
 		.alu_data(exu_data),
-		.pc(pc)
+		.pc(pc),
+		.nextpc(nextpc)
 	);
 	
 	ysyx_25100258_RegisterFile u_RegisterFile(

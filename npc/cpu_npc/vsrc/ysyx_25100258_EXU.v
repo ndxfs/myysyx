@@ -10,7 +10,9 @@ module ysyx_25100258_EXU(
 	input	[31:0]	imm,
 	output			reg_wen,
 	//output	[3:0]	mem_op,
-	output	[31:0]	alu_data
+	output	[31:0]	alu_data,
+	output	[31:0]	nextpc
+
 );
 	`include "ysyx_25100258_riscv_param.vh"
 	`include "ysyx_25100258_riscv_param_exu.vh"
@@ -20,12 +22,20 @@ module ysyx_25100258_EXU(
 	begin
 		if(inst_out == EBREAK_OP) ebreak_call();
 	end
+
 	wire [31:0] data_addi;
 	wire [31:0]	op1;
 	wire [31:0] op2;
+	wire [31:0] pcop1;
+	wire [31:0] pcop2;
+	wire [31:0] dnpc;
+	wire [31:0] snpc;
+	wire		jflag;
 
+	wire [31:0] op1_u = ((inst_out == LUI_OP) ? 32'd0 : pc);
 
-	wire [31:0] op_u = ((inst_out == LUI_OP) ? 32'd0 : pc);
+	assign jflag = (inst_out == JAL_OP) | (inst_out == JALR_OP);
+	assign nextpc = jflag ? dnpc : snpc;
 
 	//两个操作数选择器
 	ysyx_25100258_MuxKeyWithDefault #(6, 3, 32) u_MuxKey_op1(
@@ -37,7 +47,7 @@ module ysyx_25100258_EXU(
 			I_TYPE, src1,	
 			S_TYPE, src1,
 			B_TYPE, src1,
-			U_TYPE, op_u,
+			U_TYPE, op1_u,
 			J_TYPE, pc
 		})
 	);
@@ -55,28 +65,48 @@ module ysyx_25100258_EXU(
 			J_TYPE, imm
 		})
 	);
-	//assign op1 =	(inst_type == R_TYPE) ? src1 :
-	//				(inst_type == I_TYPE) ? src1 :
-	//				(inst_type == U_TYPE) ? (inst_out == LUI_OP ? 32'd0 : pc) : 32'd0;
 
-	//assign op2 =	(inst_type == R_TYPE) ? src2 :
-	//				(inst_type == I_TYPE) ? imm :
-	//				(inst_type == U_TYPE) ? imm : 32'd0;
+	ysyx_25100258_MuxKeyWithDefault #(2, 3, 32) u_MuxKey_pcop1(
+		.out(pcop1),
+		.key(inst_type),
+		.default_out(32'b0),
+		.lut({
+			J_TYPE, pc,
+			I_TYPE, src1
+		})
+	);
+
+	ysyx_25100258_MuxKeyWithDefault #(2, 3, 32) u_MuxKey_pcop2(
+		.out(pcop2),
+		.key(inst_type),
+		.default_out(32'b0),
+		.lut({
+			J_TYPE, imm,
+			I_TYPE, imm
+		})
+	);
 
 
 
-	assign	data_addi	=	op1 + op2; 
-	
+	assign	data_addi	=	op1		+ op2;//需要用加法器实现 
+	assign	snpc		=	pc		+ 32'd4;
+	assign	dnpc		=	pcop1	+ pcop2;
+
 	//根据指令选择结果
-	ysyx_25100258_MuxKeyWithDefault #(1, 17, 32) u_MuxKey_alu(
+	ysyx_25100258_MuxKeyWithDefault #(5, 17, 32) u_MuxKey_alu(
 		.out(alu_data),
 		.key(inst_out),
 		.default_out(32'b0),
 		.lut({
-			ADDI_OP, data_addi
+			ADDI_OP,	data_addi,
+			LUI_OP,		data_addi,
+			AUIPC_OP,	data_addi,
+			JALR_OP,	snpc,
+			JAL_OP,		snpc
+
 		})
 	);
-	
+
 	//控制是否写寄存器
 	ysyx_25100258_MuxKeyWithDefault #(7, 3, 1) u_MuxKey_reg(
 		.out(reg_wen),
