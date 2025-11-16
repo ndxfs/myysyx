@@ -7,7 +7,8 @@ $(VERILATOR_MK): $(VSRC) $(CSRC) $(CXXSRC)
 		--top-module $(TOP) \
 		-I./vsrc \
 		--Mdir $(BUILD_DIR) \
-		-CFLAGS "-I$(PWD)/include -I$(PWD)/$(BUILD_DIR)" \
+		-CFLAGS "-I$(PWD)/include -I$(PWD)/$(BUILD_DIR) $(CFLAGS)" \
+		-LDFLAGS "-lreadline" \
 		--cc $(VSRC) \
 		--exe $(CSRC) $(CXXSRC)
 	$(info [BUILD] Verilator 生成完成：$@)

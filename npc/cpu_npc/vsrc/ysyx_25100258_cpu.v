@@ -55,7 +55,8 @@ module ysyx_25100258_cpu(
 		.reg_wen(reg_wen),
 		.alu_data(exu_data),
 		.pc(pc),
-		.nextpc(nextpc)
+		.nextpc(nextpc),
+		.rst(rst)
 	);
 	
 	ysyx_25100258_RegisterFile u_RegisterFile(

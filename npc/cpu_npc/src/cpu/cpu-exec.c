@@ -2,9 +2,9 @@
 #include <isa.h>
 #include <cpu/decode.h>
 #include <verilated_connect.h>
-//#include <cpu/difftest.h>
+#include <cpu/difftest.h>
 #include <locale.h>
-//#include "../monitor/sdb/sdb.h"
+#include "../monitor/sdb/sdb.h"
 
 /* The assembly code of instructions executed is only output to the screen
  * when the number of instructions executed is less than this value.
@@ -12,33 +12,33 @@
  * You can modify this value as you want.
  */
 #define MAX_INST_TO_PRINT 10
-//#define MAX_IRINGBF 16
+#define MAX_IRINGBF 16
 
-/*typedef struct{
+typedef struct{
 	char logs[MAX_IRINGBF][128];
 	vaddr_t pcs[MAX_IRINGBF];
 	int head;
 	int tail;
 	int count;
-} IRingBuf;*/
+} IRingBuf;
 
 CPU_state cpu = {};
 uint64_t g_nr_guest_inst = 0;
 static uint64_t g_timer = 0; // unit: us
 static bool g_print_step = false;
 static bool watchpoint_flag = false;
-//static IRingBuf iringbuf;
+static IRingBuf iringbuf;
 
 void device_update();
 
-/*void init_iringbuf() {
+void init_iringbuf() {
 	iringbuf.head = 0;
 	iringbuf.tail = 0;
 	iringbuf.count = 0;
 	memset(iringbuf.logs, 0, sizeof(iringbuf.logs));
-}*/
+}
 
-/*void record_error_instruction(vaddr_t pc){
+void record_error_instruction(vaddr_t pc){
 	if (iringbuf.count < MAX_IRINGBF) {
         	iringbuf.count++;
     	} else {
@@ -51,9 +51,9 @@ void device_update();
     	strcpy(iringbuf.logs[iringbuf.tail], error_log);
     	iringbuf.pcs[iringbuf.tail] = pc;
     	iringbuf.tail = (iringbuf.tail + 1) % MAX_IRINGBF;
-}*/
+}
 
-/*void print_iringbuf(vaddr_t pc) {
+void print_iringbuf(vaddr_t pc) {
 	int index;
 	
 	printf("Instructions ringbuffer recorded %d instructions-----------------\n", iringbuf.count);
@@ -69,9 +69,9 @@ void device_update();
 		printf("%s\n", iringbuf.logs[index]);
 	}
 	printf("----------------------------------------------------------------\n");
-}*/
+}
 
-/*static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
+static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
 #ifdef CONFIG_ITRACE_COND
   if (ITRACE_COND) { \
 	  log_write("%s\n", _this->logbuf); 
@@ -94,29 +94,31 @@ void device_update();
   void check_function_call_or_return(Decode *s);
   check_function_call_or_return(_this);
 #endif
+
 #ifdef CONFIG_WATCHPOINT 
   //printf("prewatching point ready\n");
   watchpoint_flag = watchpoint_check();
   if (watchpoint_flag) npc_state.state = NPC_STOP;
 #endif
 
-}*/
+}
 
 static void exec_once(Decode *s, vaddr_t pc) {
-  //s->pc = pc;
+  s->pc = pc;
   //s->snpc = pc;
   isa_exec_once(s);
-  //cpu.pc = s->dnpc;
-/*#if def CONFIG_ITRACE
+  cpu.pc = s->dnpc;
+#ifdef CONFIG_ITRACE
   char *p = s->logbuf;
   p += snprintf(p, sizeof(s->logbuf), FMT_WORD ":", s->pc);
+
   int ilen = s->snpc - s->pc;
   int i;
   uint8_t *inst = (uint8_t *)&s->isa.inst;
 #ifdef CONFIG_ISA_x86
   for (i = 0; i < ilen; i ++) {
 #else
-  for (i = ilen - 1; i >= 0; i --) {
+  for (i = ilen -  1; i >= 0; i --) {
 #endif
     p += snprintf(p, 4, " %02x", inst[i]);
   }
@@ -130,7 +132,8 @@ static void exec_once(Decode *s, vaddr_t pc) {
   void disassemble(char *str, int size, uint64_t pc, uint8_t *code, int nbyte);
   disassemble(p, s->logbuf + sizeof(s->logbuf) - p,
       MUXDEF(CONFIG_ISA_x86, s->snpc, s->pc), (uint8_t *)&s->isa.inst, ilen);
-#endif*/
+  //printf("log buf:%s\n", s->logbuf);
+ #endif
 }
 
 static void execute(uint64_t n) {
@@ -138,7 +141,7 @@ static void execute(uint64_t n) {
   for (;n > 0; n --) {
     exec_once(&s, cpu.pc);
     g_nr_guest_inst ++;
-    //trace_and_difftest(&s, cpu.pc);
+    trace_and_difftest(&s, cpu.pc);
     if (npc_state.state != NPC_RUNNING) break;
     IFDEF(CONFIG_DEVICE, device_update());
   }
@@ -181,6 +184,6 @@ void cpu_exec(uint64_t n) {
             ANSI_FMT("HIT BAD TRAP", ANSI_FG_RED))),
           npc_state.halt_pc);
       // fall through
-    //case NPC_QUIT: statistic();
+    case NPC_QUIT: statistic();
   }
 }

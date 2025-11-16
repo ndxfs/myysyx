@@ -1,6 +1,7 @@
 #include <verilated_connect.h>
 #include <cpu/decode.h>
 #include <cpu/ifetch.h>
+#include <isa.h>
 
 /*uint32_t inst[INST_NUMBER] = {
   // 32条addi指令：格式为 addi rd, rs1, imm（用x0做rs1，直接给rd赋值imm，易观察）
@@ -41,27 +42,47 @@
 
 
 static Vysyx_25100258_cpu* top;
-uint32_t regs[32];
+void set_nemu_state(int state, vaddr_t pc, int halt_ret);
+void invalid_inst(vaddr_t thispc);
 
 extern "C" void ebreak_call(){
 	printf("ebreak call, sim end.\n");
 	printf("at pc : 0x%x\n", top->pc);
+	read_all_register();
+	set_nemu_state(NPC_END, top->pc, cpu.gpr[10]);
 	npc_state.state = NPC_END;
+}
+
+extern "C" void unknow_inst()
+{
+	invalid_inst(top->pc);
 }
 
 void read_all_register(){
 	//extern void read_register(uint32_t reg_addr, uint32_t *reg_num);
 	svSetScope(svGetScopeFromName("TOP.ysyx_25100258_cpu.u_RegisterFile"));
-	for(int i = 0; i < 32; i++) read_register(i, (int *)regs + i);
+	for(int i = 0; i < 32; i++) read_register(i, (int *)cpu.gpr + i);
 }
 
+void read_cpu_state(Decode *s){
+	svSetScope(svGetScopeFromName("TOP.ysyx_25100258_cpu.u_EXU"));
+	read_s((int *)&s->pc, (int *)&s->snpc, (int *)&s->dnpc);
+}
 void display_regs(){
-	for(int i; i < 32; i++) printf("reg[%d] = 0x%x\n", i, regs[i]);
+	for(int i; i < 32; i++) printf("reg[%d] = 0x%x\n", i, cpu.gpr[i]);
+}
+
+void half_cycle_down() {
+	top->clk = 0; top->eval();
+}
+
+void half_cycle_up() {
+	top->clk = 1; top->eval();
 }
 
 void single_cycle() {
-	top->clk = 0; top->eval();
-	top->clk = 1; top->eval();
+	half_cycle_down();
+	half_cycle_up();
 }
 
 void reset(int n) {
@@ -80,12 +101,16 @@ void sim_exit(){
 }
 
 int isa_exec_once(Decode *s){
-	uint32_t inst_in = inst_fetch(&top->pc, 4);
-	top->inst_in = inst_fetch(&top->pc, 4);
+	s->isa.inst = inst_fetch(&s->pc, 4);
+	top->inst_in = s->isa.inst;
 	//top->inst_in = inst[(top->pc - 0x80000000)/4];
-	single_cycle();
-	s->pc = top->pc;
-	printf("pc" FMT_WORD "\n", s->pc);
+	half_cycle_down();
+	read_cpu_state(s);
+	half_cycle_up();
+	read_all_register();
+	if(npc_state.state != NPC_RUNNING) return 0;
+	//printf("dnpc" FMT_WORD "\n", s->dnpc);
+	//printf("sp:%x\n",cpu.gpr[2]);
 	return 0;
 }
 
@@ -101,7 +126,7 @@ int isa_exec_once(Decode *s){
 	}
 	read_all_register();
 
-	display_regs();
+	display_cpu.gpr();
 
 	sim_exit();
 }*/

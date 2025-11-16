@@ -23,13 +23,18 @@ module ysyx_25100258_IDU(
 	//查找表数量，switch宽度，输出宽度
 	//类型查找，R:000 I:001 S:010 B:011 U:100 J:101 N:110
 	//以opcode判断类型
-	ysyx_25100258_MuxKeyWithDefault #(2, 7, 3) u_MuxKey_type(
+	ysyx_25100258_MuxKeyWithDefault #(7, 7, 3) u_MuxKey_type(
 		inst_type,
 		inst[6:0],
 		3'b111,
 		{
 			7'b0010011, I_TYPE,
-			7'b1110011, N_TYPE
+			7'b1110011, N_TYPE,
+			7'b0110111, U_TYPE,
+			7'b0010111, U_TYPE,
+			7'b1101111, J_TYPE,
+			7'b1100111, I_TYPE,
+			7'b0100011, S_TYPE
 		}
 	);
 

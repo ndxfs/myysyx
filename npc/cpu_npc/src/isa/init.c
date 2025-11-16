@@ -20,9 +20,22 @@
 // this is not consistent with uint8_t
 // but it is ok since we do not access the array directly
 static const uint32_t img [] = {
-  0x00000297,  // auipc t0,0
-  0x00100073,  // ebreak (used as nemu_trap)
-  0xdeadbeef,  // some data
+0x00000413,          	//li	s0,0
+0x00009117,          	//auipc	sp,0x9
+0xffc10113,          	//addi	sp,sp,-4 # 80009000 <_end>
+0x00c000ef,          	//jal	ra,80000018 <_trm_init>
+0x00000513,          	//li	a0,0
+0x00008067,          	//ret
+0xff010113,          	//addi	sp,sp,-16
+0x00000517,          	//auipc	a0,0x0
+0x01c50513,          	//addi	a0,a0,28 # 80000038 <_etext>
+0x00112623,          	//sw	ra,12(sp)
+0xfe9ff0ef,          	//jal	ra,80000010 <main>
+0x00050513,          	//mv	a0,a0
+0x00100073,          	//ebreak
+0x0000006f,          	//j	80000034 <_trm_init+0x1c>  
+ 
+
 };
 
 static void restart() {

@@ -9,7 +9,7 @@ module ysyx_25100258_RegisterFile  (
   output [31:0] rdata1,
   output [31:0] rdata2
 );
-  reg [31:0] rf [2**5-1:0];
+  reg [31:0] rf [31:0];
 
 
   export "DPI-C" function read_register;

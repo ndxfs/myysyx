@@ -1,4 +1,5 @@
 module ysyx_25100258_EXU(
+	input			rst,
 	input	[31:0]	pc,
 	input	[16:0]	inst_out,
 	input	[2:0]	inst_type,
@@ -22,6 +23,24 @@ module ysyx_25100258_EXU(
 	begin
 		if(inst_out == EBREAK_OP) ebreak_call();
 	end
+	
+	wire	unknow_flag;
+	import "DPI-C" function void unknow_inst();
+	always @ (unknow_flag)
+	begin
+		if(unknow_flag == 1) unknow_inst();
+	end
+
+	export "DPI-C" function read_s;
+
+	function void read_s;
+		output int s_pc;
+		output int s_snpc;
+		output int s_dnpc;
+		s_pc = pc;
+		s_snpc = snpc;
+		s_dnpc = nextpc;
+	endfunction
 
 	wire [31:0] data_addi;
 	wire [31:0]	op1;
@@ -36,7 +55,16 @@ module ysyx_25100258_EXU(
 
 	assign jflag = (inst_out == JAL_OP) | (inst_out == JALR_OP);
 	assign nextpc = jflag ? dnpc : snpc;
-
+	assign unknow_flag = ~(
+		inst_out == EBREAK_OP	||
+		inst_out == ADDI_OP		||
+		inst_out == LUI_OP		||
+		inst_out == AUIPC_OP	||
+		inst_out == JAL_OP		||
+		inst_out == JALR_OP		||
+		inst_out == SW_OP		||
+		rst		
+	);
 	//两个操作数选择器
 	ysyx_25100258_MuxKeyWithDefault #(6, 3, 32) u_MuxKey_op1(
 		.out(op1),
