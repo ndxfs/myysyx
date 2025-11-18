@@ -2,6 +2,7 @@
 #include <cpu/decode.h>
 #include <cpu/ifetch.h>
 #include <isa.h>
+#include <memory/vaddr.h>
 
 /*uint32_t inst[INST_NUMBER] = {
   // 32条addi指令：格式为 addi rd, rs1, imm（用x0做rs1，直接给rd赋值imm，易观察）
@@ -40,10 +41,19 @@
   0x00100073,  //ebreak
 };*/
 
-
+word_t inst;
 static Vysyx_25100258_cpu* top;
 void set_nemu_state(int state, vaddr_t pc, int halt_ret);
 void invalid_inst(vaddr_t thispc);
+
+extern "C" void err_call(){
+	printf("err call, sim end.\n");
+	printf("at pc : 0x%x\n", top->pc);
+	read_all_register();
+	set_nemu_state(NPC_ABORT, top->pc, cpu.gpr[10]);
+	npc_state.state = NPC_END;
+}
+
 
 extern "C" void ebreak_call(){
 	printf("ebreak call, sim end.\n");
@@ -56,6 +66,34 @@ extern "C" void ebreak_call(){
 extern "C" void unknow_inst()
 {
 	invalid_inst(top->pc);
+}
+
+extern "C" void cpu_pmem_write(int waddr, int wdata, char wmask)
+{
+	uint32_t write_data=wdata;
+	printf("pmem_write called\n");
+	for(uint32_t i = 0; i < 4; i++)
+	{
+		if(wmask & 0x01)
+		{
+			vaddr_write((waddr & ~0x3u) + i, 1, write_data);
+		}
+		wmask = wmask >> 1;
+		write_data = write_data >> 8;
+	}
+	//vaddr_write(waddr & ~0x3u, wmask, wdata);
+}
+
+extern "C" int cpu_pmem_read(int raddr)
+{
+	printf("cpu_pmem_read called\n");   
+	return vaddr_read(raddr & ~0x3u, 4);
+}
+
+extern "C" int cpu_inst_fetch(int pc)
+{
+	inst = inst_fetch((vaddr_t *)&pc, 4);
+	return inst;
 }
 
 void read_all_register(){
@@ -73,10 +111,12 @@ void display_regs(){
 }
 
 void half_cycle_down() {
+	//printf("down half cycle\n");
 	top->clk = 0; top->eval();
 }
 
 void half_cycle_up() {
+	//printf("up half cycle\n");
 	top->clk = 1; top->eval();
 }
 
@@ -101,11 +141,11 @@ void sim_exit(){
 }
 
 int isa_exec_once(Decode *s){
-	s->isa.inst = inst_fetch(&s->pc, 4);
-	top->inst_in = s->isa.inst;
+	//top->inst_in = s->isa.inst;
 	//top->inst_in = inst[(top->pc - 0x80000000)/4];
 	half_cycle_down();
 	read_cpu_state(s);
+	s->isa.inst = inst;
 	half_cycle_up();
 	read_all_register();
 	if(npc_state.state != NPC_RUNNING) return 0;

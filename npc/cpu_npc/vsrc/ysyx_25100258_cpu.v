@@ -1,7 +1,7 @@
 module ysyx_25100258_cpu(
 	input			clk,
 	input			rst,
-	input	[31:0]	inst_in,
+	//input	[31:0]	inst_in,
 	output	[31:0]	pc
 	//output	[31:0]	data_out,
 	//output	[31:0]	addr
@@ -20,7 +20,7 @@ module ysyx_25100258_cpu(
 	ysyx_25100258_IFU u_IFU(
 		.clk(clk),
 		.rst(rst),
-		.inst_in(inst_in),
+		//.inst_in(inst_in),
 		.inst(inst),
 		.nextpc(nextpc),
 		.pc(pc)
@@ -46,11 +46,13 @@ module ysyx_25100258_cpu(
 
 	wire			reg_wen;
 	ysyx_25100258_EXU u_EXU(
+		//.clk(clk),
 		.inst_out(inst_out),	
 		.inst_type(inst_type),
 		.src1(src1),
 		.src2(src2),
-		.rd(rd),
+		//.shamt(src2_addr),
+		//.rd(rd),
 		.imm(imm),
 		.reg_wen(reg_wen),
 		.alu_data(exu_data),

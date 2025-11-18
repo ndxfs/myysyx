@@ -41,7 +41,7 @@ static word_t pmem_read(paddr_t addr, int len) {
 }
 
 void write_mtrace(paddr_t addr, int len, word_t data) {
-	printf("mtrace:write %d byte(s) with the data = " FMT_WORD " to addr = " FMT_PADDR " at pc = " FMT_WORD "\n", len, addr, data, cpu.pc);
+	printf("mtrace:write %d byte(s) with the data = " FMT_WORD " to addr = " FMT_PADDR " at pc = " FMT_WORD "\n", len, data, addr, cpu.pc);
 }
 static void pmem_write(paddr_t addr, int len, word_t data) {
   IFDEF(CONFIG_MTRACE, write_mtrace(addr, len, data));
