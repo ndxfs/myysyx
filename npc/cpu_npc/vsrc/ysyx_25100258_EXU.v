@@ -18,6 +18,7 @@ module ysyx_25100258_EXU(
 	`include "ysyx_25100258_riscv_param_exu.vh"
 
 	reg [31:0] rdata;
+	`ifndef SYNTHESIS
 	import "DPI-C" function int cpu_pmem_read(input int raddr);
 	import "DPI-C" function void cpu_pmem_write(input int waddr, input int wdata, input byte wmask);
 
@@ -48,6 +49,7 @@ module ysyx_25100258_EXU(
 		s_snpc = snpc;
 		s_dnpc = nextpc;
 	endfunction
+	`endif
 
 	wire [31:0] data_add;
 	wire [31:0] data_and;

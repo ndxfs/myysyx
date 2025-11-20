@@ -94,9 +94,19 @@ int printf(const char *fmt, ...) {
 	va_start(ap, fmt);
 	int ret = vsprintf(buf, fmt, ap);
 	va_end(ap);
-#ifdef __ISA_NATIVE__
-	if(ret > 0) write(STDOUT_FILENO, buf, ret);
-#endif
+
+	if (ret > 0) 
+	{
+		for (int i = 0; i < ret; i++) 
+		{
+            char ch = buf[i];
+            if (ch == '\n') 
+			{
+                putch('\r'); 
+            }
+            putch(ch); 
+        }
+    }
 
 	return ret;
 	//panic("Not implemented");
