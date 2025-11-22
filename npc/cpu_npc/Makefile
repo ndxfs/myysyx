@@ -39,7 +39,7 @@ endif
 
 NPC_EXEC = $(BUILD_DIR)/V$(TOP)
 VERILATOR_MK = $(BUILD_DIR)/V$(TOP).mk
-#include scripts/config.mk
+include scripts/config.mk
 
 include $(CPU_HOME)/scripts/build.mk
 include $(CPU_HOME)/scripts/native.mk
