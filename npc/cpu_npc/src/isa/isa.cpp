@@ -5,50 +5,10 @@
 #include <cstdint>
 #include "Vysyx_25100258_cpu__Dpi.h"
 #include <Vysyx_25100258_cpu.h>
-//#include <cpu/decode.h>
-//#include <cpu/ifetch.h>
-//#include <isa.h>
-//#include <memory/vaddr.h>
-
-/*uint32_t inst[INST_NUMBER] = {
-  // 32条addi指令：格式为 addi rd, rs1, imm（用x0做rs1，直接给rd赋值imm，易观察）
-  0x00100093,  // 0: addi x1, x0, 1    (pc=0x80000000 → 索引0)
-  0x00200113,  // 1: addi x2, x0, 2    (pc=0x80000004 → 索引1)
-  0x00300193,  // 2: addi x3, x0, 3    (pc=0x80000008 → 索引2)
-  0x00400213,  // 3: addi x4, x0, 4
-  0x00500293,  // 4: addi x5, x0, 5
-  0x00600313,  // 5: addi x6, x0, 6
-  0x00700393,  // 6: addi x7, x0, 7
-  0x00800413,  // 7: addi x8, x0, 8
-  0x00900493,  // 8: addi x9, x0, 9
-  0x00a00513,  // 9: addi x10, x0, 10
-  0x00b00593,  // 10: addi x11, x0, 11
-  0x00c00613,  // 11: addi x12, x0, 12
-  0x00d00693,  // 12: addi x13, x0, 13
-  0x00e00713,  // 13: addi x14, x0, 14
-  0x00f00793,  // 14: addi x15, x0, 15
-  0x01000813,  // 15: addi x16, x0, 16
-  0x01100893,  // 16: addi x17, x0, 17
-  0x01200913,  // 17: addi x18, x0, 18
-  0x01300993,  // 18: addi x19, x0, 19
-  0x01400a13,  // 19: addi x20, x0, 20
-  0x01500a93,  // 20: addi x21, x0, 21
-  0x01600b13,  // 21: addi x22, x0, 22
-  0x01700b93,  // 22: addi x23, x0, 23
-  0x01800c13,  // 23: addi x24, x0, 24
-  0x01900c93,  // 24: addi x25, x0, 25
-  0x01a00d13,  // 25: addi x26, x0, 26
-  0x01b00d93,  // 26: addi x27, x0, 27
-  0x01c00e13,  // 27: addi x28, x0, 28
-  0x01d00e93,  // 28: addi x29, x0, 29
-  0x01e00f13,  // 29: addi x30, x0, 30
-  0x01f00f93,  // 30: addi x31, x0, 31 （RISC-V只有x0-x31，最后一条用x31）
-  0x02000013,  // 31: addi x0, x0, 32 （x0写不进去，验证“写x0无效”特性）
-  0x00100073,  //ebreak
-};*/
-
 
 word_t inst;
+word_t read_data;
+bool w_flag, r_flag;
 static Vysyx_25100258_cpu* top;
 void set_nemu_state(int state, vaddr_t pc, int halt_ret);
 void invalid_inst(vaddr_t thispc);
@@ -77,24 +37,44 @@ extern "C" void unknow_inst()
 
 extern "C" void cpu_pmem_write(int waddr, int wdata, char wmask)
 {
-	uint32_t write_data=wdata;
-	printf("pmem_write called\n");
-	for(uint32_t i = 0; i < 4; i++)
+	uint32_t write_data = wdata;
+	//uint32_t preread_data;
+	//preread_data = vaddr_read(waddr & ~0x3u, 4);
+	if(w_flag)
 	{
-		if(wmask & 0x01)
+		w_flag = false;
+		//printf("pmem_write called\n");
+		switch (wmask) 
 		{
-			vaddr_write((waddr & ~0x3u) + i, 1, write_data);
+			case 1:	vaddr_write((waddr & ~0x3u), 1, write_data);
+					break;
+			case 2:	vaddr_write(((waddr & ~0x3u) + 0x1u), 1, write_data >> 8);
+					break;
+			case 4:	vaddr_write(((waddr & ~0x3u) + 0x2u), 1, write_data >> 16);
+					break;
+			case 8:	vaddr_write(((waddr & ~0x3u) + 0x3u), 1, write_data >> 24);
+					break;
+			case 3:	vaddr_write((waddr & ~0x3u), 2, write_data);
+					break;
+			case 12:vaddr_write(((waddr & ~0x3u) + 0x2u), 2, write_data >> 16);
+					break;
+			case 15:vaddr_write((waddr & ~0x3u), 4, write_data);
+					break;
 		}
-		wmask = wmask >> 1;
-		write_data = write_data >> 8;
 	}
 	//vaddr_write(waddr & ~0x3u, wmask, wdata);
 }
 
 extern "C" int cpu_pmem_read(int raddr)
 {
-	printf("cpu_pmem_read called\n");   
-	return vaddr_read(raddr & ~0x3u, 4);
+	if(r_flag)
+	{		
+		r_flag = false;
+		//printf("cpu_pmem_read called\n");   
+		read_data = vaddr_read(raddr & ~0x3u, 4); 
+		return read_data;
+	}
+	return read_data;
 }
 
 extern "C" int cpu_inst_fetch(int pc)
@@ -118,12 +98,12 @@ void display_regs(){
 }
 
 void half_cycle_down() {
-	//printf("down half cycle\n");
+	//printf("vvv----------down half cycle\n");
 	top->clk = 0; top->eval();
 }
 
 void half_cycle_up() {
-	//printf("up half cycle\n");
+	//printf("^^^----------up half cycle\n");
 	top->clk = 1; top->eval();
 }
 
@@ -139,6 +119,8 @@ void reset(int n) {
 }
 
 void sim_init(){
+	w_flag = false;
+	r_flag = true;
 	top = new Vysyx_25100258_cpu;
 	reset(10);
 }
@@ -151,9 +133,13 @@ int isa_exec_once(Decode *s){
 	//top->inst_in = s->isa.inst;
 	//top->inst_in = inst[(top->pc - 0x80000000)/4];
 	half_cycle_down();
+	w_flag = false;
+	r_flag = false;
 	read_cpu_state(s);
 	s->isa.inst = inst;
 	half_cycle_up();
+	w_flag = true;
+	r_flag = true;
 	read_all_register();
 	if(npc_state.state != NPC_RUNNING) return 0;
 	//printf("dnpc" FMT_WORD "\n", s->dnpc);

@@ -20,6 +20,7 @@ begin
 	begin
 		inst <= cpu_inst_fetch(nextpc);
 		pc <= nextpc;
+		//$display("inst = %x",inst);
 	end
 end
 

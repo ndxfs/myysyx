@@ -44,7 +44,7 @@ $(BINARY): $(OBJS) $(VSRC) $(CPP_SRC) $(OBJS)
 		-I./vsrc \
 		--cc $(VSRC) \
 		--exe $(CPP_SRC) $(OBJS) \
-		-LDFLAGS "-fsanitize=address -lreadline" \
+		-LDFLAGS "-fsanitize=address -lreadline -lSDL2" \
 		--build
 
 -include $(OBJS:.o=.d)

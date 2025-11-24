@@ -36,7 +36,12 @@ module ysyx_25100258_EXU(
 	import "DPI-C" function void unknow_inst();
 	always @ (unknow_flag)
 	begin
-		if(unknow_flag == 1) unknow_inst();
+		if(unknow_flag == 1)
+		begin	
+			$display("this inst_out is not equal to inst");	
+			$display("unknow inst_out:%016x", inst_out);	
+			unknow_inst();
+		end
 	end
 
 	export "DPI-C" function read_s;
@@ -244,22 +249,22 @@ module ysyx_25100258_EXU(
 	);
 
 	reg [7:0] wmask;
-	reg valid;
+	reg ren;
 	reg wen;
 	reg [31:0] wdata;
 	always @(*)
 	begin
-		valid	= 1'b0;
+		ren		= 1'b0;
 		wen		= 1'b0;
 		wmask	= 8'b0;
 		wdata	= 32'b0;
 		case(inst_out)
 			LB_OP, LH_OP, LW_OP, LBU_OP, LHU_OP: begin
-				valid	= 1'b1;
+				ren		= 1'b1;
 				wen		= 1'b0;
 			end
 			SB_OP: begin
-				valid	= 1'b1;
+				ren		= 1'b0;
 				wen		= 1'b1;
 				//$display("SB called");
 				case(data_add[1:0])
@@ -270,7 +275,7 @@ module ysyx_25100258_EXU(
 				endcase
 			end
 			SH_OP: begin
-				valid	= 1'b1;
+				ren		= 1'b0;
 				wen		= 1'b1;	
 				//$display("SH called");
 				case(data_add[1:0])
@@ -281,7 +286,7 @@ module ysyx_25100258_EXU(
 				endcase
 			end
 			SW_OP: begin
-				valid	= 1'b1;
+				ren		= 1'b0;
 				wen		= 1'b1;
 				//$display("SW called");
 				case(data_add[1:0])
@@ -292,7 +297,7 @@ module ysyx_25100258_EXU(
 				endcase
 			end
 			default: begin
-				valid	= 1'b0;
+				ren		= 1'b0;
 				wen		= 1'b0;
 			end
 		endcase
@@ -317,15 +322,15 @@ module ysyx_25100258_EXU(
 
 	//reg last_wen;
 	wire [31:0] rdata_raw;
-	assign rdata_raw = (valid && ~rst) ? cpu_pmem_read(data_add) : 32'b0;	
+	assign rdata_raw = (ren && ~rst) ? cpu_pmem_read(data_add) : 32'b0;	
 
 
 	always @(*) begin
 		rdata		= 32'b0;
 		//rdata_raw	= 32'b0;
-		//$display("DEBUG: rst=%b, valid=%b, data_add=%h", rst, valid, data_add);
-  		if (valid && ~rst) begin // 有读写请求时
-			//$display("valid,:%b  rst:%b", valid, rst);
+		//$display("DEBUG: rst=%b, ren=%b, data_add=%h", rst, ren, data_add);
+  		if (~rst) begin // 有读写请求时
+			//$display("ren,:%b  rst:%b", ren, rst);
 			//err_call();
 			/* verilator lint_off IGNOREDRETURN */
     		//cpu_pmem_read(data_add);
@@ -333,7 +338,7 @@ module ysyx_25100258_EXU(
     		if (wen) begin // 有写请求时
       			cpu_pmem_write(data_add, wdata, wmask);
     		end
-			else begin
+			else if (ren) begin
 				case(inst_out)
 					LB_OP, LBU_OP: begin
 						case(data_add[1:0])
