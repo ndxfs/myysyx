@@ -1,20 +1,60 @@
+# NPC构建规则
 
+.DEFAULT_GOAL = app
 
-# Verilator 生成 mk 文件和 C++ 代码的规则（仅源文件更新时重新生成）
-$(VERILATOR_MK): $(VSRC) $(CSRC) $(CXXSRC)
-	$(info [BUILD] 生成 Verilator 编译文件...)
-	$(VERILATOR) $(VERILATOR_FLAGS) \
+WORK_DIR  = $(shell pwd)
+BUILD_DIR = $(WORK_DIR)/build
+
+# Object directories
+VERILATOR_OBJ_DIR = $(BUILD_DIR)/obj-verilator
+NPC_OBJ_DIR = $(BUILD_DIR)/obj-$(NAME)
+VERILATOR = verilator
+CPP_SRC = $(CPU_HOME)/src/isa/isa.cpp
+
+# Include paths
+#INC_PATH := $(WORK_DIR)/include $(BUILD_DIR) $(INC_PATH)
+#INCLUDES = $(addprefix -I, $(INC_PATH))
+INC_PATH := $(WORK_DIR)/include $(INC_PATH)
+OBJ_DIR  = $(BUILD_DIR)/obj-$(NAME)
+BINARY   = $(BUILD_DIR)/V$(TOP)
+
+# C/C++编译器
+CC = gcc
+CXX = g++
+
+INCLUDES = $(addprefix -I, $(INC_PATH))
+CFLAGS  := -O2 -MMD -Wall -Werror $(INCLUDES) $(CFLAGS)
+
+OBJS = $(SRCS:%.c=$(OBJ_DIR)/%.o) $(CXXSRC:%.cc=$(OBJ_DIR)/%.o)
+
+#$(info [DEBUG] The list of object files (OBJS) is: $(OBJS))
+
+$(OBJ_DIR)/%.o: %.c
+	@echo + CC $<
+	@mkdir -p $(dir $@)
+	@$(CC) $(CFLAGS) -c -o $@ $<
+	$(call call_fixdep, $(@:.o=.d), $@)
+
+$(BINARY): $(OBJS) $(VSRC) $(CPP_SRC) $(OBJS)
+	@echo "[VERILATOR] 编译Verilog和C++，链接o..."
+	$(VERILATOR) \
 		--top-module $(TOP) \
-		-I./vsrc \
 		--Mdir $(BUILD_DIR) \
-		-CFLAGS "-I$(PWD)/include -I$(PWD)/$(BUILD_DIR) $(CFLAGS)" \
-		-LDFLAGS "-lreadline" \
+		-CFLAGS "-I$(PWD)/include -I$(PWD)/$(BUILD_DIR)" \
+		-I./vsrc \
 		--cc $(VSRC) \
-		--exe $(CSRC) $(CXXSRC)
-	$(info [BUILD] Verilator 生成完成：$@)
-	sed -i '1i CXXFLAGS = $(CXXFLAGS_BASE) $(CXXFLAGS_EXTRA)' $(VERILATOR_MK)
+		--exe $(CPP_SRC) $(OBJS) \
+		-LDFLAGS "-fsanitize=address -lreadline" \
+		--build
 
-$(BINARY): $(VERILATOR_MK)
-	$(MAKE) -C $(BUILD_DIR) -f $(notdir $(VERILATOR_MK))
+-include $(OBJS:.o=.d)
+
+.PHONY: app clean
+
+app: $(BINARY)
+
+clean:
+	-rm -rf $(BUILD_DIR)
 
 
+#$(BINARY):: $(OBJS)

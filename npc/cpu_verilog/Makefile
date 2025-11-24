@@ -29,7 +29,7 @@ compile:
 	
 
 	#make -C $(OBJ_DIR) -f V$(TOP).mk V$(TOP) $(OBJ_DIR)/V$(TOP)
-	make -C $(OBJ_DIR) -f V$(TOP).mk
+	#make -C $(OBJ_DIR) -f V$(TOP).mk
 
 run:
 	$(OBJ_DIR)/$(TOP) 

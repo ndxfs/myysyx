@@ -1,8 +1,14 @@
 #include <verilated_connect.h>
-#include <cpu/decode.h>
-#include <cpu/ifetch.h>
-#include <isa.h>
-#include <memory/vaddr.h>
+#include "verilated.h"
+#include "verilated_vcd_c.h"
+#include "svdpi.h"
+#include <cstdint>
+#include "Vysyx_25100258_cpu__Dpi.h"
+#include <Vysyx_25100258_cpu.h>
+//#include <cpu/decode.h>
+//#include <cpu/ifetch.h>
+//#include <isa.h>
+//#include <memory/vaddr.h>
 
 /*uint32_t inst[INST_NUMBER] = {
   // 32条addi指令：格式为 addi rd, rs1, imm（用x0做rs1，直接给rd赋值imm，易观察）
@@ -40,6 +46,7 @@
   0x02000013,  // 31: addi x0, x0, 32 （x0写不进去，验证“写x0无效”特性）
   0x00100073,  //ebreak
 };*/
+
 
 word_t inst;
 static Vysyx_25100258_cpu* top;

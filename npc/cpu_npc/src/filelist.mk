@@ -13,16 +13,16 @@
 # See the Mulan PSL v2 for more details.
 #**************************************************************************************/
 
-ifdef CONFIG_DIFFTEST
-	DIFF_REF_PATH = $(CPU_HOME)/$(call remove_quote,$(CONFIG_DIFFTEST_REF_PATH))
-DIFF_REF_SO = $(DIFF_REF_PATH)/build/$(GUEST_ISA)-$(call remove_quote,$(CONFIG_DIFFTEST_REF_NAME))-so
-MKFLAGS = GUEST_ISA=$(GUEST_ISA) SHARE=1 ENGINE=interpreter
-ARGS_DIFF = --diff=$(DIFF_REF_SO)
+SRCS-y += src/npc_main.c
+DIRS-y += src/cpu src/monitor src/utils
+DIRS-$(CONFIG_MODE_SYSTEM) += src/memory
+DIRS-BLACKLIST-$(CONFIG_TARGET_AM) += src/monitor/sdb
 
-#ifndef CONFIG_DIFFTEST_REF_NPC
-#$(DIFF_REF_SO):
-#	$(MAKE) -s -C $(DIFF_REF_PATH) $(MKFLAGS)
-#endif
+SHARE = $(if $(CONFIG_TARGET_SHARE),1,0)
+LIBS += $(if $(CONFIG_TARGET_NATIVE_ELF),-lreadline -ldl -pie,)
 
-.PHONY: $(DIFF_REF_SO)
+ifdef mainargs
+ASFLAGS += -DBIN_PATH=\"$(mainargs)\"
 endif
+SRCS-$(CONFIG_TARGET_AM) += src/am-bin.S
+.PHONY: src/am-bin.S

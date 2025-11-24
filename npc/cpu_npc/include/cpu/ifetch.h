@@ -14,12 +14,21 @@
 ***************************************************************************************/
 
 #ifndef __CPU_IFETCH_H__
+#define __CPU_IFETCH_H__
 
 #include <memory/vaddr.h>
 
-static inline uint32_t inst_fetch(vaddr_t *pc, int len) {
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+static  inline uint32_t inst_fetch(vaddr_t *pc, int len) {
   uint32_t inst = vaddr_ifetch(*pc, len);
   return inst;
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

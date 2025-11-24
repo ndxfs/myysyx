@@ -1,55 +1,37 @@
+# NPC Makefile - 基于成功案例优化
+-include $(CPU_HOME)/include/config/auto.conf
+-include $(CPU_HOME)/include/config/auto.conf.cmd
 
-
--include include/config/auto.conf
 remove_quote = $(patsubst "%",%,$(1))
 
 GUEST_ISA ?= $(call remove_quote,$(CONFIG_ISA))
-
-FLAGS_TRACE += -DITRACE_COND=$(if $(CONFIG_ITRACE_COND),$(call remove_quote,$(CONFIG_ITRACE_COND)),true)
-CFLAGS += $(FLAGS_TRACE) -D__GUEST_ISA__=$(GUEST_ISA)
-
-
-# Verilator构建
-VERILATOR = verilator
-VERILATOR_FLAGS = --trace --Wall
-TOP := ysyx_25100258_cpu
-BUILD_DIR = build
-# 源文件
-VSRC = $(wildcard vsrc/*.v)
-
-DIRS-y := src src/isa src/engine/interpreter src/utils src/monitor src/memory src/monitor/sdb src/cpu src/cpu/difftest
+ENGINE ?= $(call remove_quote,$(CONFIG_ENGINE))
+NAME    = $(GUEST_ISA)-npc-$(ENGINE)
 
 FILELIST_MK = $(shell find -L ./src -name "filelist.mk")
 include $(FILELIST_MK)
 
-DIRS-BLACKLIST-y += $(DIRS-BLACKLIST)
-SRCS-BLACKLIST-y += $(SRCS-BLACKLIST) $(shell find -L $(DIRS-BLACKLIST-y) -name "*.c" | sort -u)  
-SRCS-y += $(shell find -L $(DIRS-y) -name "*.c")  
-CSRC = $(filter-out $(SRCS-BLACKLIST-y),$(SRCS-y))  
-CXXSRC = $(wildcard src/isa/*.cpp)
+#verilator
+TOP := ysyx_25100258_cpu
 
-BINARY = $(BUILD_DIR)/V$(TOP)
-BUILD_MODE ?= release
-CXXFLAGS_BASE = -std=c++14
-ifeq ($(BUILD_MODE),debug)
-  CXXFLAGS_EXTRA = -g -O0
-else
-  CXXFLAGS_EXTRA = -O2
+DIRS-BLACKLIST-y += $(DIRS-BLACKLIST)
+SRCS-BLACKLIST-y += $(SRCS-BLACKLIST) $(shell find -L $(DIRS-BLACKLIST-y) -name "*.c")
+SRCS-y += $(shell find -L $(DIRS-y) -name "*.c")
+SRCS = $(filter-out $(SRCS-BLACKLIST-y),$(SRCS-y))
+#$(info SRCS is set to: $(SRCS))
+
+ifneq ($(CONFIG_CC),)
+CC = $(call remove_quote,$(CONFIG_CC))
 endif
 
-NPC_EXEC = $(BUILD_DIR)/V$(TOP)
-VERILATOR_MK = $(BUILD_DIR)/V$(TOP).mk
-include scripts/config.mk
 
-include $(CPU_HOME)/scripts/build.mk
+VSRC = $(wildcard vsrc/*.v)
+CFLAGS_BUILD += $(call remove_quote,$(CONFIG_CC_OPT))
+CFLAGS_BUILD += $(if $(CONFIG_CC_LTO),-flto,)
+CFLAGS_BUILD += $(if $(CONFIG_CC_DEBUG),-Og -ggdb3,)
+CFLAGS_BUILD += $(if $(CONFIG_CC_ASAN),-fsanitize=address,)
+CFLAGS_TRACE += -DITRACE_COND=$(if $(CONFIG_ITRACE_COND),$(call remove_quote,$(CONFIG_ITRACE_COND)),true)
+CFLAGS  += $(CFLAGS_BUILD) $(CFLAGS_TRACE) -D__GUEST_ISA__=$(GUEST_ISA)
+LDFLAGS += $(CFLAGS_BUILD)
+include $(CPU_HOME)/scripts/config.mk
 include $(CPU_HOME)/scripts/native.mk
-# 主目标
-all: npc
-
-npc: $(BINARY)
-
-
-clean:
-	rm -rf $(BUILD_DIR)
-
-.PHONY: clean gdb
