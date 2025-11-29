@@ -18,8 +18,17 @@
 
 #include <common.h>
 
+enum {
+	mstatus,
+	mtvec,
+	mepc,
+	mcause,
+	nr_csr
+};
+
 typedef struct {
   word_t gpr[MUXDEF(CONFIG_RVE, 16, 32)];
+  word_t csr[nr_csr];
   vaddr_t pc;
 } MUXDEF(CONFIG_RV64, riscv64_CPU_state, riscv32_CPU_state);
 

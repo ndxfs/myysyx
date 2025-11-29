@@ -16,7 +16,7 @@ LDFLAGS   += --gc-sections -e _start
 NEMUFLAGS += -l $(shell dirname $(IMAGE).elf)/nemu-log.txt
 NEMUFLAGS += -e $(IMAGE).elf#传入elf文件
 #修改点，增加-b参数支持批处理模式
-RUN_NEMUFLAGS += $(NEMUFLAGS) -b
+RUN_NEMUFLAGS += $(NEMUFLAGS) #-b
 GDB_NEMUFLAGS += $(NEMUFLAGS)
 
 

@@ -32,6 +32,11 @@ static void restart() {
 
   /* The zero register is always 0. */
   cpu.gpr[0] = 0;
+#ifdef CONFIG_RV64
+  cpu.csr[mstatus] = 0xa00001800;
+#else
+  cpu.csr[mstatus] = 0x1800;
+#endif
 }
 
 void init_isa() {

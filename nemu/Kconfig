@@ -154,7 +154,7 @@ config ITRACE_COND
 config MTRACE
   depends on TRACE && TARGET_NATIVE_ELF && ENGINE_INTERPRETER
   bool "Enable memory tracer"
-  default y
+  default n
 
 config MTRACE_COND
   depends on MTRACE
@@ -164,11 +164,31 @@ config MTRACE_COND
 config FTRACE
   depends on TRACE && TARGET_NATIVE_ELF && ENGINE_INTERPRETER
   bool "Enable function tracer"
-  default y
+  default n
  
 config FTRACE_COND
   depends on FTRACE
   string "Only function call or return when condition is true"
+  default "true"
+
+config DTRACE
+  depends on TRACE && TARGET_NATIVE_ELF && ENGINE_INTERPRETER
+  bool "Enable device tracer(TODO)"
+  default n
+ 
+config DTRACE_COND
+  depends on DTRACE
+  string "Only device call when condition is true"
+  default "true"
+
+config ETRACE
+  depends on TRACE && TARGET_NATIVE_ELF && ENGINE_INTERPRETER
+  bool "Enable exception tracer"
+  default n
+ 
+config ETRACE_COND
+  depends on ETRACE
+  string "Only exception when condition is true"
   default "true"
 
 config DIFFTEST

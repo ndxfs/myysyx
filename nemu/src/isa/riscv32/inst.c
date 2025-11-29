@@ -25,7 +25,7 @@
 enum {
   TYPE_I, TYPE_U, TYPE_S,
   TYPE_N, TYPE_J, TYPE_B,
-  TYPE_R
+  TYPE_R, TYPE_CSR
 };
 
 #define src1R() do { *src1 = R(rs1); } while (0)
@@ -36,13 +36,14 @@ enum {
 #define immJ() do { *imm = (SEXT(BITS(i, 31, 31), 1) << 20) | BITS(i, 30, 21) << 1 | BITS(i, 20, 20) << 11 | BITS(i, 19, 12) << 12;} while(0)
 #define immB() do { *imm = (SEXT(BITS(i, 31, 31), 1) << 12) | BITS(i, 7, 7) << 11 | BITS(i, 30, 25) << 5 | BITS(i, 11, 8) << 1; } while(0)
 #define immR() do { *imm = SEXT(BITS(i, 24, 20), 5); } while(0)
+#define csr() do { *csr_addr = BITS(i, 31, 20); } while(0)
 
-static void decode_operand(Decode *s, int *rd, word_t *src1, word_t *src2, word_t *imm, int type) {
+static void decode_operand(Decode *s, int *rd, word_t *src1, word_t *src2, word_t *imm, word_t *csr_addr, int type) {
   uint32_t i = s->isa.inst;
   int rs1 = BITS(i, 19, 15);
   int rs2 = BITS(i, 24, 20);
   *rd     = BITS(i, 11, 7);
-  switch (type) {
+   switch (type) {
     case TYPE_I:	src1R();				immI(); break;
     case TYPE_U:							immU(); break;
     case TYPE_S:	src1R();	src2R();	immS(); break;
@@ -50,6 +51,7 @@ static void decode_operand(Decode *s, int *rd, word_t *src1, word_t *src2, word_
     case TYPE_N:									break;
 	case TYPE_B:	src1R();	src2R();	immB();	break;
 	case TYPE_R:	src1R();	src2R();	immR();	break;//位移指令有shamt，其中immR即为shamt
+	case TYPE_CSR:	src1R();	csr();				break;
     default: panic("unsupported type = %d", type);
   }
 }
@@ -60,8 +62,8 @@ static int decode_exec(Decode *s) {
 #define INSTPAT_INST(s) ((s)->isa.inst)
 #define INSTPAT_MATCH(s, name, type, ... /* execute body */ ) { \
   int rd = 0; \
-  word_t src1 = 0, src2 = 0, imm = 0; \
-  decode_operand(s, &rd, &src1, &src2, &imm, concat(TYPE_, type)); \
+  word_t src1 = 0, src2 = 0, imm = 0, csr_addr = 0; \
+  decode_operand(s, &rd, &src1, &src2, &imm, &csr_addr, concat(TYPE_, type)); \
   __VA_ARGS__ ; \
 }
 /* imm：指令中的立即数
@@ -116,7 +118,8 @@ static int decode_exec(Decode *s) {
   INSTPAT("1000001 10011 00000 000 00000 00011 11", fence.tso	, N, printf("need to implent the instruction fence.tso. please complete the inst.c\n"));
   INSTPAT("??????? ????? ????? 000 ????? 00011 11", fence	, N, printf("need to implent the instruction fence. please complete the inst.c\n"));
   INSTPAT("0000000 10000 00000 000 00000 00011 11", pause	, N, printf("need to implent the instruction pause. please complete the inst.c\n"));
-  INSTPAT("0000000 00000 00000 000 00000 11100 11", ecall	, N, printf("need to implent the instruction ecall. please complete the inst.c\n"));
+  //INSTPAT("0000000 00000 00000 000 00000 11100 11", ecall	, N, printf("need to implent the instruction ecall. please complete the inst.c\n"));
+  INSTPAT("0000000 00000 00000 000 00000 11100 11", ecall	, N, s->dnpc = ecall(s->pc));
 
   //RV32M Standard Extension
   INSTPAT("0000001 ????? ????? 000 ????? 01100 11", mul		, R, R(rd) = src1 * src2);
@@ -127,6 +130,11 @@ static int decode_exec(Decode *s) {
   INSTPAT("0000001 ????? ????? 101 ????? 01100 11", divu	, R, if(src2 == 0) R(rd) = 0xFFFFFFFF; else R(rd) = src1 / src2);
   INSTPAT("0000001 ????? ????? 110 ????? 01100 11", rem		, R, if(src2 == 0) R(rd) = src1; else if((int32_t)src2 == -1 && (int32_t)src1 == 0x80000000) R(rd) = 0; else R(rd) = (int32_t)src1 % (int32_t)src2);
   INSTPAT("0000001 ????? ????? 111 ????? 01100 11", remu	, R, if(src2 == 0) R(rd) = src1; else R(rd) = src1 % src2);
+
+  //CSR Instructions
+  INSTPAT("??????? ????? ????? 001 ????? 11100 11" ,csrrw	, CSR, csrrw(csr_addr, src1, rd));
+  INSTPAT("??????? ????? ????? 010 ????? 11100 11" ,csrrs	, CSR, csrrs(csr_addr, src1, rd));
+  INSTPAT("0011000 00010 ????? 000 ????? 11100 11" ,mret	, CSR, s->dnpc = eret(s->pc));
 
   INSTPAT("??????? ????? ????? ??? ????? ????? ??", inv		, N, INV(s->pc));
 
