@@ -1,0 +1,47 @@
+	//{funct7,funct3,opcode}
+	localparam ADDI_OP	= 17'b0000000_000_0010011;
+	localparam LUI_OP	= 17'b0000000_000_0110111;
+	localparam AUIPC_OP	= 17'b0000000_000_0010111;
+	localparam JAL_OP	= 17'b0000000_000_1101111;
+	localparam JALR_OP	= 17'b0000000_000_1100111;
+	//localparam SW_OP	= 17'b0000000_010_0100011;
+	//wait to implement
+
+	localparam BEQ_OP	= 17'b0000000_000_1100011;
+	localparam BNE_OP	= 17'b0000000_001_1100011;
+	localparam BLT_OP	= 17'b0000000_100_1100011;
+	localparam BGE_OP	= 17'b0000000_101_1100011;
+	localparam BLTU_OP	= 17'b0000000_110_1100011;
+	localparam BGEU_OP	= 17'b0000000_111_1100011;
+
+	localparam LB_OP	= 17'b0000000_000_0000011;
+	localparam LH_OP	= 17'b0000000_001_0000011;
+	localparam LW_OP	= 17'b0000000_010_0000011;
+	localparam LBU_OP	= 17'b0000000_100_0000011;
+	localparam LHU_OP	= 17'b0000000_101_0000011;
+
+	localparam SB_OP	= 17'b0000000_000_0100011;
+	localparam SH_OP	= 17'b0000000_001_0100011;
+	localparam SW_OP	= 17'b0000000_010_0100011;
+
+	localparam SLTI_OP	= 17'b0000000_010_0010011;
+	localparam SLTIU_OP	= 17'b0000000_011_0010011;
+	localparam XORI_OP	= 17'b0000000_100_0010011;
+	localparam ORI_OP	= 17'b0000000_110_0010011;
+	localparam ANDI_OP	= 17'b0000000_111_0010011;
+
+	localparam SLLI_OP	= 17'b0000000_001_0010011;
+	localparam SRLI_OP	= 17'b0000000_101_0010011;
+	localparam SRAI_OP	= 17'b0100000_101_0010011;
+	localparam ADD_OP	= 17'b0000000_000_0110011;
+	localparam SUB_OP	= 17'b0100000_000_0110011;
+	localparam SLL_OP	= 17'b0000000_001_0110011;
+	localparam SLT_OP	= 17'b0000000_010_0110011;
+	localparam SLTU_OP	= 17'b0000000_011_0110011;
+	localparam XOR_OP	= 17'b0000000_100_0110011;
+	localparam SRL_OP	= 17'b0000000_101_0110011;
+	localparam SRA_OP	= 17'b0100000_101_0110011;
+	localparam OR_OP	= 17'b0000000_110_0110011;
+	localparam AND_OP	= 17'b0000000_111_0110011;
+
+

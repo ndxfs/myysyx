@@ -1,0 +1,34 @@
+top=top_alu
+
+result (LD3, LD2, LD1, LD0)
+B (SW3, SW2, SW1, SW0)
+A (SW7, SW6, SW5, SW4)
+operation (SW15, SW14, SW13)
+segC (SEG0A, SEG0B, SEG0C, SEG0D, SEG0E, SEG0F, SEG0G)
+segCC SEG1G
+segB (SEG2A, SEG2B, SEG2C, SEG2D, SEG2E, SEG2F, SEG2G)
+segBB SEG3G
+segA (SEG4A, SEG4B, SEG4C, SEG4D, SEG4E, SEG4F, SEG4G)
+segAA SEG5G
+vcc SEG1A
+vcc SEG1B
+vcc SEG1C
+vcc SEG1D
+vcc SEG1E
+vcc SEG1F
+
+
+vcc SEG3A
+vcc SEG3B
+vcc SEG3C
+vcc SEG3D
+vcc SEG3E
+vcc SEG3F
+
+
+vcc SEG5A
+vcc SEG5B
+vcc SEG5C
+vcc SEG5D
+vcc SEG5E
+vcc SEG5F

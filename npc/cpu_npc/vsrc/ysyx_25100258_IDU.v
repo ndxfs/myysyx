@@ -13,9 +13,10 @@ module ysyx_25100258_IDU(
 );
 
 	`include "ysyx_25100258_riscv_param.vh"
-
+	
+	`ifndef SYNTHESIS
 	import "DPI-C" function int cpu_inst_fetch(input int pc);
-
+	`endif
 	//wire [6:0]	opcode;
 	wire [31:0]	imm_R;
 	wire [31:0]	imm_I;

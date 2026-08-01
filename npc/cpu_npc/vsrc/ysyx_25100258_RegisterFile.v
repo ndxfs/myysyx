@@ -11,7 +11,7 @@ module ysyx_25100258_RegisterFile  (
 );
   reg [31:0] rf [31:0];
 
-
+`ifndef SYNTHESIS
   export "DPI-C" function read_register;
 
   function void read_register;
@@ -19,7 +19,7 @@ module ysyx_25100258_RegisterFile  (
 		output int reg_num;
 		reg_num = rf[reg_addr];
   endfunction
-    
+`endif    
   //写入
   always @(posedge clk) begin
 	if (rst)

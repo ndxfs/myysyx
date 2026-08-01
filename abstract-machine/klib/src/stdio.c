@@ -73,6 +73,82 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
 				*p++ = c;
 				break;
 			}
+			case 'p':/* pointer */
+			{
+                    uintptr_t ptr_val = (uintptr_t)va_arg(ap, void *);
+                    *p++ = '0';
+                    *p++ = 'x';
+
+                    // 将指针值转换为16进制字符串
+                    char buf[17]; // 64位指针最多16个十六进制数字
+                    char *ptr = buf;
+                    int digits = 0;
+                    uintptr_t val = ptr_val;
+
+                    do {
+                        int digit = val % 16;
+                        *ptr++ = (digit < 10) ? ('0' + digit) : ('a' + digit - 10);
+                        val /= 16;
+                        digits++;
+                    } while (val > 0);
+
+                    // 填充前导零，使总宽度为机器字长/4（64位系统为16，32位系统为8）
+                    while (digits < sizeof(uintptr_t) * 2) {
+                        *ptr++ = '0';
+                        digits++;
+                    }
+
+                    *ptr-- = '\0';
+                    // 反转字符串
+                    char *start = buf;
+                    while (start < ptr) {
+                        char tmp = *start;
+                        *start = *ptr;
+                        *ptr = tmp;
+                        start++;
+                        ptr--;
+                    }
+
+                    strcpy(p, buf);
+                    p += strlen(buf);
+                    break;
+            }
+			case 'x': /* hexadecimal */ 
+			{                    
+					unsigned int hex_val = va_arg(ap, unsigned int);
+                    char buf[9]; // 32位最多8个十六进制数字
+                    char *ptr = buf;
+                    int digits = 0;
+                    unsigned int val = hex_val;
+                    
+                    do {
+                        int digit = val % 16;
+                        *ptr++ = (digit < 10) ? ('0' + digit) : ('a' + digit - 10);
+                        val /= 16;
+                        digits++;
+                    } while (val > 0);
+                    
+                    // 填充前导零，使总宽度为8
+                    while (digits < 8) {
+                        *ptr++ = '0';
+                        digits++;
+                    }
+                    
+                    *ptr-- = '\0';
+                    // 反转字符串
+                    char *start = buf;
+                    while (start < ptr) {
+                        char tmp = *start;
+                        *start = *ptr;
+                        *ptr = tmp;
+                        start++;
+                        ptr--;
+                    }
+                    
+                    strcpy(p, buf);
+                    p += strlen(buf);
+                    break;
+                }
 			default: 
 			{
                 *p++ = '%';
