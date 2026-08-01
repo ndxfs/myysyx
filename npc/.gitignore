@@ -7,6 +7,13 @@
 !*.v
 !*.cc
 !*.cpp
+!*.vh
+!*.sv
+!*.svh
+!*.nxdc
+!Kconfig
+!*_defconfig
 !.gitignore
 !README.md
 build/
+obj_dir/
